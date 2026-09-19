@@ -18,6 +18,7 @@ Run:  python verify.py            (offline only)
 """
 from pathlib import Path
 import argparse
+import hashlib
 import re
 import subprocess
 import sys
@@ -30,8 +31,12 @@ BASE = "https://fscholtesdowd.github.io/regen-farm-log"
 # Locate it by walking up and testing for the tool ITSELF, never by counting
 # directory hops and never by a marker that only exists on one machine.
 _REL = Path("02 - Projects") / "Farm Brain"
-TOOLS = next((d / _REL for d in HERE.parents if (d / _REL / "pseo_gate.py").exists()),
-             HERE / "_tools_not_found")
+_ROOT = next((d for d in HERE.parents if (d / _REL / "pseo_gate.py").exists()), None)
+TOOLS = (_ROOT / _REL) if _ROOT else HERE / "_tools_not_found"
+
+# The buyer unlock plaintext deliberately lives OUTSIDE this public repo.
+_PLAINTEXT_FILE = (_ROOT / "02 - Projects" / "Etsy Digital Products"
+                   / "Regen Field Log - Unlock Code.md") if _ROOT else HERE / "_absent"
 
 results = []
 
@@ -85,8 +90,21 @@ def offline():
     lic = (HERE / "js" / "license.js").read_text(encoding="utf-8")
     check("no gumroad token in client js",
           "gumroad_token" not in lic and not re.search(r"Bearer\s+\w", lic))
-    check("unlock code is stored hashed, not in plaintext",
-          re.search(r"UNLOCK_SHA256\s*=\s*'[0-9a-f]{64}'", lic) is not None)
+    m = re.search(r"UNLOCK_SHA256\s*=\s*'([0-9a-f]{64})'", lic)
+    check("unlock code is stored hashed, not in plaintext", m is not None)
+    # A 64-hex-char literal is not evidence of anything -- it matches the hash of
+    # a string nobody has. The ONLY check that catches a broken unlock path is
+    # hashing the real plaintext and comparing. The plaintext lives outside this
+    # repo on purpose (non-buyers must not have it), so if it is absent the
+    # verdict is WITHHELD, never quietly passed.
+    if m and _PLAINTEXT_FILE.exists():
+        want = re.search(r"`([A-Z0-9-]{8,})`", _PLAINTEXT_FILE.read_text(encoding="utf-8"))
+        got = hashlib.sha256(want.group(1).encode()).hexdigest() if want else None
+        check("shipped hash IS the hash of the real unlock code", got == m.group(1),
+              "a buyer's code would be rejected" if got != m.group(1) else "end-to-end")
+    else:
+        check("unlock plaintext on file to verify against", False,
+              f"WITHHELD -- no plaintext at {_PLAINTEXT_FILE.name}, cannot prove buyers can unlock")
 
     # --- repo carries no local editor/agent config ---
     check(".gitignore carries .claude/", ".claude/" in
@@ -100,6 +118,22 @@ def offline():
                  "organic-certification-recordkeeping"):
         p = HERE / slug / "index.html"
         check(f"page built: {slug}", p.exists() and p.stat().st_size > 2000)
+    # --- the compliance page quotes the regulation COMPLETELY ---
+    # The page is headed "word for word". An omitted requirement is invisible to
+    # a reader and to a cross-check, because a cross-check tests what you SAID,
+    # never what you left out. So the count and each item are asserted here.
+    paper = (HERE / "organic-certification-paperwork" / "index.html").read_text(encoding="utf-8")
+    items = re.findall(r"<li>(.*?)</li>", paper, re.S)
+    check("all 5 of 7 CFR 205.103(b) are quoted", len(items) == 5, f"{len(items)} items rendered")
+    for frag in ("adapted to the particular business",
+                 "traceable back to the last certified operation",
+                 "Include audit trail documentation",
+                 "not less than 5 years",
+                 "demonstrate compliance with the Act"):
+        check(f"205.103(b) fragment present: {frag[:38]}", frag in paper)
+    check("page does not promise the wrong count", "four things" not in paper.lower()
+          and "four sentences" not in paper.lower())
+
     check("sitemap lists 4 urls",
           (HERE / "sitemap.xml").read_text(encoding="utf-8").count("<loc>") == 4)
 

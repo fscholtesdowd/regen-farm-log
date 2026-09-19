@@ -41,7 +41,13 @@ BASE = "https://fscholtesdowd.github.io/regen-farm-log"
 CFR_BULLETS = [
     "Be adapted to the particular business that the certified operation is conducting;",
     "Fully disclose all activities and transactions of the certified operation, in "
-    "sufficient detail as to be readily understood and audited;",
+    "sufficient detail as to be readily understood and audited; records must span the "
+    "time of purchase or acquisition, through production, to sale or transport and be "
+    "traceable back to the last certified operation;",
+    "Include audit trail documentation for agricultural products handled or produced by "
+    "the certified operation and identify agricultural products on these records as "
+    "“100% organic,” “organic,” or “made with organic (specified "
+    "ingredients or food group(s)),” or similar terms, as applicable;",
     "Be maintained for not less than 5 years beyond their creation; and",
     "Be sufficient to demonstrate compliance with the Act and the regulations in this part.",
 ]
@@ -85,12 +91,12 @@ PAGES = [
     {
         "slug": "organic-certification-paperwork",
         "title": "Organic Certification Paperwork: What the Rule Actually Asks For",
-        "desc": "The four things 7 CFR 205.103 requires of your records, quoted, "
-                "plus what that means for a small farm keeping them by hand.",
+        "desc": "The five things 7 CFR 205.103 requires of your records, quoted in "
+                "full, plus what each one means for a small farm keeping records by hand.",
         "h1": "Organic Certification Paperwork",
         "lede": "People picture a mountain of forms. The recordkeeping rule itself is "
-                "four sentences long. It is worth reading them once, because they ask "
-                "for less than most farms think, and something different.",
+                "five short requirements. It is worth reading them once, because they "
+                "ask for less than most farms think, and something different.",
         "body": [
             ("What the rule says, word for word",
              "Under 7 CFR 205.103, a certified operation must keep records that:"),
@@ -105,6 +111,13 @@ PAGES = [
              "than \"I know what this means.\" Shorthand only you can read, undated "
              "notes, and a pile of receipts with no link to a field all fail this test "
              "even though the information is technically there."),
+            ("The audit trail is the one people skip",
+             "Item 3 is the requirement most often missed, and the one an inspector is "
+             "most likely to ask about. It is not enough that you wrote things down. "
+             "The records have to let someone follow a product backwards, from the sale "
+             "all the way to the last certified operation it came from. That is what "
+             "\"audit trail\" means here, and it is why item 2 says your records must "
+             "span purchase, production and sale rather than just the day's work."),
             ("Five years is longer than it sounds",
              "Records have to be kept for not less than 5 years beyond their creation. "
              "A phone gets replaced about every three. Whatever you keep records in, "
