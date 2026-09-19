@@ -1,40 +1,34 @@
 /* license.js -- free/pro tier gate for Regen Farm Field Log.
  *
- * SHIPPED 2026-09-18 (Doug, regen-log-ship). Scope locked by Forrest 2026-08-24:
- * $29 Gumroad lifetime licence unlocks unlimited paddocks + audit PDF export;
- * the free tier keeps ONE paddock and the whole logging/timeline surface.
+ * The free tier keeps ONE paddock plus the whole logging/timeline surface.
+ * A $29 one-time licence unlocks unlimited paddocks and the audit PDF export.
  *
  * TWO credentials are accepted, on purpose:
  *
- *   1. A Gumroad PER-SALE LICENCE KEY, checked against Gumroad's PUBLIC
+ *   1. A PER-SALE LICENCE KEY, checked against Gumroad's PUBLIC
  *      POST /v2/licenses/verify endpoint. That endpoint takes product_id +
- *      license_key and needs NO seller token, so nothing secret ships in this
- *      file. This is the real mechanism.
+ *      license_key and needs NO seller token, which is what lets a static,
+ *      backend-free app verify a real licence without shipping any secret to
+ *      the browser. This is the primary mechanism.
  *
- *   2. A BUYER UNLOCK CODE, delivered on the Gumroad receipt/content page.
- *      This exists because Gumroad's API silently refuses to switch per-sale
- *      licence keys on: PUT /v2/products/:id with is_licensed / licenses_enabled
- *      / should_show_license_key all return success: true and leave is_licensed
- *      null (measured 2026-09-18, three field names, same result -- the same
- *      "write 200s and ignores the field" shape as the Etsy price bug). Until
- *      Forrest ticks that checkbox in the Gumroad UI, per-sale keys DO NOT
- *      EXIST, so a key-only gate would take a buyer's $29 and hand them nothing.
- *      The code path below is what makes the product deliverable today.
- *
- * When Forrest ticks the box, route 1 starts working with no code change and
- * route 2 can be retired by deleting UNLOCK_SHA256.
+ *   2. A BUYER UNLOCK CODE, delivered with the purchase. Per-sale licence keys
+ *      must be switched on in the seller UI; until they are, no per-sale key
+ *      exists for a buyer to enter, so a key-only gate would take payment and
+ *      hand the buyer nothing. This second route keeps the product deliverable
+ *      either way. Once per-sale keys are on, route 1 works with no code change
+ *      and route 2 retires by deleting UNLOCK_SHA256.
  *
  * OFFLINE-FIRST: this is a PWA used in a field with no signal. A licence is
  * verified ONCE over the network, then cached in localStorage and trusted
- * offline forever. Verification is never required to open the app or to read
- * existing entries -- losing signal must never lock a farmer out of their own
+ * offline afterwards. Verification is never required to open the app or to read
+ * existing entries -- losing signal must never lock someone out of their own
  * records.
  *
- * HONEST LIMIT, stated so nobody mistakes this for DRM: every check here runs
- * in the browser, so anyone with devtools can set the cache key by hand and get
- * pro for free. That is true of every client-side licence on every $29 tool.
- * The gate is honesty-priced, not tamper-proof. Making it tamper-proof needs a
- * server we do not have and would not pay for (NO-PAY LAW).
+ * HONEST LIMIT, so nobody mistakes this for DRM: every check here runs in the
+ * browser, so anyone with devtools can set the cache key by hand. That is true
+ * of every client-side licence at this price. The gate is honesty-priced, not
+ * tamper-proof; making it tamper-proof would need a server this app
+ * deliberately does not have.
  */
 
 const LICENSE_STORAGE_KEY = 'regenFieldLog.license.v1';
@@ -43,7 +37,7 @@ const GUMROAD_PRODUCT_URL = 'https://wealthywellness0.gumroad.com/l/regenfieldlo
 const GUMROAD_VERIFY_URL = 'https://api.gumroad.com/v2/licenses/verify';
 
 // SHA-256 of the buyer unlock code. The plaintext is NOT in this file, so
-// reading the source does not hand out the code -- it only proves a code exists.
+// reading the source does not hand out the code -- it only proves one exists.
 const UNLOCK_SHA256 = 'd16f45be7467189fecaa7ba3e4e8e78b36fca1144a4804e99122a7e76b066065';
 
 const FREE_PADDOCK_LIMIT = 1;

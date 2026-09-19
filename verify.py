@@ -26,11 +26,12 @@ import urllib.request
 
 HERE = Path(__file__).resolve().parent
 BASE = "https://fscholtesdowd.github.io/regen-farm-log"
-# Resolve the vault by a marker, never by counting directory hops -- counting
-# breaks the moment the project moves, which is exactly how this file was born.
-_VAULT = next((d for d in HERE.parents
-               if (d / "CLAUDE.md").exists() and (d / "AI Memory Vault").is_dir()), None)
-FARM_BRAIN = (_VAULT / "02 - Projects" / "Farm Brain") if _VAULT else HERE / "_no_vault"
+# The distinctness gate lives in a shared tooling directory outside this repo.
+# Locate it by walking up and testing for the tool ITSELF, never by counting
+# directory hops and never by a marker that only exists on one machine.
+_REL = Path("02 - Projects") / "Farm Brain"
+TOOLS = next((d / _REL for d in HERE.parents if (d / _REL / "pseo_gate.py").exists()),
+             HERE / "_tools_not_found")
 
 results = []
 
@@ -87,7 +88,7 @@ def offline():
     check("unlock code is stored hashed, not in plaintext",
           re.search(r"UNLOCK_SHA256\s*=\s*'[0-9a-f]{64}'", lic) is not None)
 
-    # --- public repo carries no internal strays ---
+    # --- repo carries no local editor/agent config ---
     check(".gitignore carries .claude/", ".claude/" in
           (HERE / ".gitignore").read_text(encoding="utf-8"))
     tracked = subprocess.run(["git", "ls-files"], cwd=HERE, capture_output=True, text=True).stdout
@@ -103,7 +104,7 @@ def offline():
           (HERE / "sitemap.xml").read_text(encoding="utf-8").count("<loc>") == 4)
 
     # --- programmatic-seo gate (BLOCK if the gate file is missing) ---
-    gate = FARM_BRAIN / "pseo_gate.py"
+    gate = TOOLS / "pseo_gate.py"
     if not gate.exists():
         check("pseo_gate.py present", False, f"missing at {gate}")
     else:

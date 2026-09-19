@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """build.py -- emits the Regen Farm Field Log's content pages + sitemap.
 
-WHY THESE THREE PAGES AND NO OTHERS (demand gate, 2026-09-18, keyword_probe.py
-with its positive AND negative controls PASSing on every single run, so a zero
-here is a real zero and not a dead reader):
+WHY THESE THREE PAGES AND NO OTHERS. Each candidate keyword was probed for real
+search demand with a reader that ships a positive AND a negative control, and
+both controls passed on every single run -- so a zero below is a real zero and
+not a broken reader:
 
     grazing records                      4 suggestions, incl. the literal
                                          "grazing records spreadsheet"        SHIP
@@ -11,24 +12,21 @@ here is a real zero and not a dead reader):
                                          application / requirements)          SHIP
     organic certification recordkeeping  3 suggestions, incl. the literal
                                          "organic certification record keeping" SHIP
-    organic farm record keeping          0                                    KILLED
-    usda organic recordkeeping           0                                    KILLED
-    pasture grazing log                  0                                    KILLED
+    organic farm record keeping          0                                    DROPPED
+    usda organic recordkeeping           0                                    DROPPED
+    pasture grazing log                  0                                    DROPPED
     zqxwvj plarn frotz mibblenock        0  (junk control)
 
-HONEST LIMIT: autocomplete measures query SHAPE, never volume (the probe says so
-itself -- the same harvest inverts under a different gl=). And page-1 competition
-is NOT checked here, because research run #33 found all eight free SERP readers
-failing their own positive control. The corrected 08-24 rule is "weak page 1
-first, demand second", so the page-1 half of that gate is still outstanding and
-is named as an open item in the Progress Log rather than quietly skipped.
+HONEST LIMIT: autocomplete measures query SHAPE, never volume -- the same
+harvest inverts under a different country code. Page-1 competition is NOT
+checked here and remains an open question.
 
 FACTS: the 7 CFR 205.103 wording below is quoted from the regulation text at
-govinfo (CFR-2024-title7-vol3-sec205-103), fetched and cross-checked 2026-09-18
-via crosscheck.py. The first cross-check attempt used ecfr.gov and came back
-DISAGREE -- that was eCFR's bot wall ("your request has been flagged as
-potentially automated") being fed to the seats as if it were the regulation, not
-a bad claim. Never quote a CFR from a page that did not actually fetch.
+govinfo (CFR-2024-title7-vol3-sec205-103). An earlier attempt to verify it
+against ecfr.gov returned a bot wall ("your request has been flagged as
+potentially automated") which reads exactly like an empty source and produced a
+false mismatch. Never quote a regulation from a page that did not actually
+fetch.
 
 Run: python build.py    (writes into this directory, then run verify.py)
 """
