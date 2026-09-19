@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fscholtesdowd.github.io/regen-farm-log/sitemap.xml

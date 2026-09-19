@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Regen Farm Field Log</title>
+<meta name="theme-color" content="#3a5a2a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>🌱 Field Log</h1>
+</header>
+
+<main id="view-root"></main>
+<div id="print-report"></div>
+
+<nav class="tabbar">
+  <button class="tab-btn active" data-view="log">Log</button>
+  <button class="tab-btn" data-view="timeline">Timeline</button>
+  <button class="tab-btn" data-view="dashboard">Paddocks</button>
+  <button class="tab-btn" data-view="export">Export</button>
+  <button class="tab-btn" data-view="manage">Manage</button>
+  <button class="tab-btn" data-view="unlock">Unlock</button>
+</nav>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/db.js"></script>
+<script src="js/license.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
