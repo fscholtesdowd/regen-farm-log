@@ -214,10 +214,11 @@ SHELL = """<!DOCTYPE html>
   <p>The Field Log is a free web app. It works with no signal, keeps photos with
   the entry, and works out paddock rest days for you. One paddock free, forever.</p>
   <a class="btn" href="{base}/">Open the free Field Log</a>
-  <a class="btn alt" href="https://wealthywellness0.gumroad.com/l/regenfieldlog">Unlock every paddock + audit PDF &mdash; $29</a>
+  <a class="btn alt" href="https://wealthywellness0.gumroad.com/l/regenfieldlog">Unlock every paddock + audit PDF, $29</a>
 </div>
 <footer>
   Regen Farm Field Log &middot; <a href="{base}/">the app</a>
+  <p class="fine"><a href="https://fscholtesdowd.github.io/privacy/">Privacy policy</a> &middot; <a href="https://fscholtesdowd.github.io/terms/">Terms</a></p>
   <p>General information about recordkeeping, not legal or certification advice.
   Your certifier is the authority on what your operation must keep.</p>
 </footer>
