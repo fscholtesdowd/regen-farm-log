@@ -17,6 +17,16 @@ not a broken reader:
     pasture grazing log                  0                                    DROPPED
     zqxwvj plarn frotz mibblenock        0  (junk control)
 
+    -- added 2026-09-24 (cloud research run #59), a DIFFERENT word family
+    -- (calculator, not tracker/log) that the app's own 09-19 dead-vocabulary
+    -- sweep never tested. Same reader, same dual controls:
+    stocking rate calculator             depth 10, incl. nz/ireland/australia/
+                                         uk geo variants                       SHIP
+    cattle per acre calculator           depth 8                               SHIP
+    how many cows per acre calculator    depth 5                               SHIP
+    xqzplonkfrobnitz nonsensewordzz      0  (junk control, same run)
+    planting zone 6                      depth 10 (known-live control, same run)
+
 HONEST LIMIT: autocomplete measures query SHAPE, never volume -- the same
 harvest inverts under a different country code. Page-1 competition is NOT
 checked here and remains an open question.
@@ -27,6 +37,17 @@ against ecfr.gov returned a bot wall ("your request has been flagged as
 potentially automated") which reads exactly like an empty source and produced a
 false mismatch. Never quote a regulation from a page that did not actually
 fetch.
+
+The stocking-rate calculator's numbers (AU = 1,000 lb cow+calf, AUM = 750 lb
+air-dry forage, daily intake = 2.5% of body weight, the Animal Unit Equivalent
+table, and "take half - leave half" = 50% utilization) are quoted from
+University of Wyoming Extension Bulletin B-1320, "Animal Unit Month (AUM)
+Concepts and Applications for Grazing Rangelands"
+(https://wyoextension.org/publications/html/B1320/), fetched live 2026-09-24.
+This tool does the arithmetic only -- it has no idea what a given acre of
+land actually produces. That number has to come from the operator's own NRCS
+Ecological Site Description or county extension office; a wrong forage input
+gives a confidently wrong answer no matter how correct the math is.
 
 Run: python build.py    (writes into this directory, then run verify.py)
 """
@@ -161,7 +182,141 @@ PAGES = [
              "as a PDF."),
         ],
     },
+    {
+        "slug": "stocking-rate-calculator",
+        "title": "Stocking Rate Calculator: How Many Cows, Sheep, Goats or Horses Per Acre",
+        "desc": "Free stocking rate / AUM calculator. Enter your acres and a forage "
+                "estimate, pick your animal, get animal units, AUM/acre, and the "
+                "head count your pasture can carry. Sourced, not guessed.",
+        "h1": "Stocking Rate Calculator",
+        "lede": "How many animals a pasture can carry is one calculation, not a "
+                "guess: acres, how much forage they grow, how much of that you're "
+                "willing to take, and how much one animal eats. This does the math; "
+                "you supply the one number only your land can give you.",
+        "calc": True,
+        "body": [
+            ("What \"stocking rate\" means",
+             "Stocking rate is usually written as AUM per acre, or its flip side, "
+             "acres per AUM. An AUM (Animal Unit Month) is the forage a 1,000-pound "
+             "cow and her unweaned calf eat in a month: 750 pounds of air-dry "
+             "forage, built from cattle eating about 2.5% of their body weight a "
+             "day. Every other animal is converted to a fraction of that one "
+             "reference animal, called its Animal Unit Equivalent (AUE)."),
+        ],
+        "body_after_calc": [
+            ("Animal Unit Equivalents, by species",
+             "AUE_TABLE"),
+            ("Where the forage number has to come from",
+             "The calculator cannot see your land. \"Forage produced per acre\" "
+             "swings by 10x or more between arid rangeland and irrigated pasture, "
+             "and by season on the same field. The real number for your acres "
+             "lives in your county NRCS office's Ecological Site Description, or "
+             "a clip-and-weigh sample you take yourself, not a table on "
+             "this page. Put in a guess and you get a confident, wrong answer; "
+             "put in a real number and the arithmetic above is the same math a "
+             "range extension agent would do by hand."),
+            ("Why \"take half, leave half\" is the default",
+             "The 50% utilization rate is not caution for its own sake. Grazing "
+             "past half the standing forage slows the plant's own regrowth, so a "
+             "field pushed past that line this year carries less next year. It is "
+             "the standard-guideline number, not a hard law: rotational, "
+             "short-duration systems can responsibly run higher; season-long "
+             "continuous grazing usually needs to run lower."),
+        ],
+    },
 ]
+
+# Animal Unit Equivalents, University of Wyoming Extension B-1320, Table 1
+# (fetched live 2026-09-24). Values are AUE -- a fraction/multiple of one
+# 1,000 lb cow-with-calf.
+AUE_TABLE = [
+    ("Cow (1,000 lb) with calf", 1.00),
+    ("Bull, mature", 1.35),
+    ("Cattle, 1 year old", 0.60),
+    ("Cattle, 2 years old", 0.80),
+    ("Horse, mature", 1.25),
+    ("Sheep, mature", 0.20),
+    ("Lamb, 1 year old", 0.15),
+    ("Goat, mature", 0.15),
+]
+
+CALC_HTML = """
+<div class="calcbox">
+  <div class="calc-row">
+    <label>Pasture size (acres)<input type="number" id="c-acres" min="0.1" step="any" value="40"></label>
+    <label>Forage produced (lb/acre for the grazing period)<input type="number" id="c-forage" min="1" step="any" value="2000"></label>
+  </div>
+  <div class="calc-row">
+    <label>Utilization rate
+      <select id="c-util">
+        <option value="0.25">25% (conservative / arid rangeland)</option>
+        <option value="0.5" selected>50% ("take half, leave half", standard)</option>
+        <option value="0.6">60% (intensive rotational grazing)</option>
+      </select>
+    </label>
+    <label>Animal
+      <select id="c-species">
+        <option value="1.00" selected>Cow (1,000 lb) with calf</option>
+        <option value="1.35">Bull, mature</option>
+        <option value="0.60">Cattle, 1 year old</option>
+        <option value="0.80">Cattle, 2 years old</option>
+        <option value="1.25">Horse, mature</option>
+        <option value="0.20">Sheep, mature</option>
+        <option value="0.15">Lamb, 1 year old</option>
+        <option value="0.15">Goat, mature</option>
+      </select>
+    </label>
+  </div>
+  <div class="calc-row">
+    <label>Head count<input type="number" id="c-head" min="1" step="1" value="20"></label>
+    <label>Grazing period (days)<input type="number" id="c-days" min="1" step="1" value="90"></label>
+  </div>
+  <button type="button" id="c-run" class="btn" style="margin-top:4px;">Calculate</button>
+  <div id="c-out" class="calc-out" aria-live="polite"></div>
+</div>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return Math.round(n*100)/100;}
+  function run(){
+    var acres=parseFloat($('c-acres').value)||0;
+    var forage=parseFloat($('c-forage').value)||0;
+    var util=parseFloat($('c-util').value)||0.5;
+    var aue=parseFloat($('c-species').value)||1;
+    var head=parseFloat($('c-head').value)||0;
+    var days=parseFloat($('c-days').value)||0;
+    var out=$('c-out');
+    if(acres<=0||forage<=0||head<=0||days<=0){
+      out.innerHTML='<p class="warn">Enter a value greater than zero in every field.</p>';
+      return;
+    }
+    var usableLbs=acres*forage*util;
+    var aumsAvailable=usableLbs/750;
+    var aumsNeeded=head*aue*(days/30.4);
+    var ratePerAcre=aumsAvailable/acres;
+    var maxHead=Math.floor(aumsAvailable/(aue*(days/30.4)));
+    var maxDays=Math.floor((aumsAvailable/(aue*head))*30.4);
+    var pct=fmt((aumsNeeded/aumsAvailable)*100);
+    var verdict = aumsNeeded<=aumsAvailable
+      ? '<p class="ok"><strong>Within capacity.</strong> This herd for this period uses '+pct+'% of the AUMs your entered acreage/forage/utilization make available.</p>'
+      : '<p class="warn"><strong>Over capacity.</strong> This herd for this period needs '+pct+'% of the AUMs available, more than the pasture provides at this utilization rate.</p>';
+    out.innerHTML =
+      verdict +
+      '<table class="calc-table"><tbody>'+
+      '<tr><td>Stocking rate</td><td>'+fmt(ratePerAcre)+' AUM/acre  ('+fmt(1/ratePerAcre)+' acres/AUM)</td></tr>'+
+      '<tr><td>Total AUMs available</td><td>'+fmt(aumsAvailable)+' AUM</td></tr>'+
+      '<tr><td>AUMs this herd needs</td><td>'+fmt(aumsNeeded)+' AUM for '+days+' days</td></tr>'+
+      '<tr><td>Max head for '+days+' days</td><td>'+(maxHead>0?maxHead:0)+' head</td></tr>'+
+      '<tr><td>Max days for '+head+' head</td><td>'+(maxDays>0?maxDays:0)+' days</td></tr>'+
+      '</tbody></table>'+
+      '<p class="src">AU/AUM/AUE definitions: University of Wyoming Extension B-1320. '+
+      'Your forage-per-acre number is yours to supply, see below.</p>';
+  }
+  $('c-run').addEventListener('click', run);
+  run();
+})();
+</script>
+"""
 
 SHELL = """<!DOCTYPE html>
 <html lang="en">
@@ -193,6 +348,23 @@ SHELL = """<!DOCTYPE html>
             border-radius:8px; padding:14px 14px 14px 32px; }}
   ol.cfr li {{ margin-bottom:8px; }}
   .src {{ font-size:0.85rem; color:var(--dim); }}
+  .calcbox {{ background:var(--surface); border:1px solid var(--border);
+              border-radius:10px; padding:16px; margin:20px 0; }}
+  .calc-row {{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px; }}
+  .calc-row label {{ flex:1 1 220px; display:flex; flex-direction:column;
+                      font-size:0.85rem; color:var(--dim); gap:4px; }}
+  .calc-row input, .calc-row select {{ font-size:1rem; padding:8px;
+        border:1px solid var(--border); border-radius:6px;
+        background:var(--bg); color:var(--text); }}
+  .calc-out {{ margin-top:14px; }}
+  .calc-out .ok {{ color:var(--accent); }}
+  .calc-out .warn {{ color:#a14a2a; }}
+  @media (prefers-color-scheme: dark) {{ .calc-out .warn {{ color:#e0a082; }} }}
+  table.calc-table {{ width:100%; border-collapse:collapse; margin-top:6px; }}
+  table.calc-table td {{ padding:6px 4px; border-bottom:1px solid var(--border); font-size:0.95rem; }}
+  table.calc-table td:first-child {{ color:var(--dim); }}
+  table.aue {{ width:100%; border-collapse:collapse; margin:10px 0; }}
+  table.aue th, table.aue td {{ text-align:left; padding:6px 8px; border-bottom:1px solid var(--border); }}
   nav.crumbs {{ font-size:0.85rem; margin-bottom:16px; }}
   footer {{ margin-top:48px; border-top:1px solid var(--border); padding-top:16px;
             font-size:0.85rem; color:var(--dim); }}
@@ -239,6 +411,22 @@ def render(page):
             parts.append('<p class="src">Source: 7 CFR 205.103(b), quoted from the '
                          '<a href="https://www.govinfo.gov/content/pkg/CFR-2024-title7-vol3/xml/'
                          'CFR-2024-title7-vol3-sec205-103.xml">Code of Federal Regulations</a>.</p>')
+    if page.get("calc"):
+        parts.append(CALC_HTML)
+        for h2, text in page.get("body_after_calc", []):
+            parts.append(f"<h2>{html.escape(h2)}</h2>")
+            if text == "AUE_TABLE":
+                rows = "\n".join(
+                    f"  <tr><td>{html.escape(name)}</td><td>{aue:.2f}</td></tr>"
+                    for name, aue in AUE_TABLE)
+                parts.append('<table class="aue"><thead><tr><th>Animal</th>'
+                             f'<th>AUE</th></tr></thead><tbody>\n{rows}\n</tbody></table>'
+                             '<p class="src">Source: University of Wyoming Extension B-1320, '
+                             '<a href="https://wyoextension.org/publications/html/B1320/">'
+                             '"Animal Unit Month (AUM) Concepts and Applications for Grazing '
+                             'Rangelands"</a>, fetched 2026-09-24.</p>')
+            else:
+                parts.append(f"<p>{html.escape(text)}</p>")
     return SHELL.format(base=BASE, body="\n".join(parts), **{
         k: html.escape(v, quote=True) if k in ("title", "desc") else v
         for k, v in page.items() if k in ("slug", "title", "desc", "h1", "lede")

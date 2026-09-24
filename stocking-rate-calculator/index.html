@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stocking Rate Calculator: How Many Cows, Sheep, Goats or Horses Per Acre</title>
+<meta name="description" content="Free stocking rate / AUM calculator. Enter your acres and a forage estimate, pick your animal, get animal units, AUM/acre, and the head count your pasture can carry. Sourced, not guessed.">
+<link rel="canonical" href="https://fscholtesdowd.github.io/regen-farm-log/stocking-rate-calculator/">
+<style>
+  :root { --bg:#faf9f6; --surface:#fff; --text:#22251f; --dim:#5d6157;
+           --accent:#3a5a2a; --border:#e0ddd4; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 42rem; margin: 0 auto; padding: 24px 16px 64px; }
+  a { color: var(--accent); }
+  h1 { font-size: 1.6rem; line-height:1.25; margin: 0 0 4px; }
+  h2 { font-size: 1.1rem; margin: 32px 0 8px; }
+  .lede { font-size: 1.05rem; color: var(--dim); margin: 12px 0 8px; }
+  .cta { background: var(--surface); border:1px solid var(--accent);
+          border-radius:10px; padding:16px; margin:32px 0; }
+  .cta-title { font-weight:600; margin-bottom:6px; }
+  .btn { display:block; text-align:center; background:var(--accent); color:#fff;
+          text-decoration:none; padding:12px; border-radius:8px; margin-top:10px;
+          font-weight:600; }
+  .btn.alt { background:var(--surface); color:var(--accent); border:1px solid var(--accent); }
+  ol.cfr { background:var(--surface); border:1px solid var(--border);
+            border-radius:8px; padding:14px 14px 14px 32px; }
+  ol.cfr li { margin-bottom:8px; }
+  .src { font-size:0.85rem; color:var(--dim); }
+  .calcbox { background:var(--surface); border:1px solid var(--border);
+              border-radius:10px; padding:16px; margin:20px 0; }
+  .calc-row { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+  .calc-row label { flex:1 1 220px; display:flex; flex-direction:column;
+                      font-size:0.85rem; color:var(--dim); gap:4px; }
+  .calc-row input, .calc-row select { font-size:1rem; padding:8px;
+        border:1px solid var(--border); border-radius:6px;
+        background:var(--bg); color:var(--text); }
+  .calc-out { margin-top:14px; }
+  .calc-out .ok { color:var(--accent); }
+  .calc-out .warn { color:#a14a2a; }
+  @media (prefers-color-scheme: dark) { .calc-out .warn { color:#e0a082; } }
+  table.calc-table { width:100%; border-collapse:collapse; margin-top:6px; }
+  table.calc-table td { padding:6px 4px; border-bottom:1px solid var(--border); font-size:0.95rem; }
+  table.calc-table td:first-child { color:var(--dim); }
+  table.aue { width:100%; border-collapse:collapse; margin:10px 0; }
+  table.aue th, table.aue td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--border); }
+  nav.crumbs { font-size:0.85rem; margin-bottom:16px; }
+  footer { margin-top:48px; border-top:1px solid var(--border); padding-top:16px;
+            font-size:0.85rem; color:var(--dim); }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14161a; --surface:#1c1f24; --text:#e8e6e1; --dim:#9aa090;
+             --accent:#8fbf6a; --border:#2a2f36; }
+    .btn { color:#14161a; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="crumbs"><a href="https://fscholtesdowd.github.io/regen-farm-log/">&larr; Regen Farm Field Log</a></nav>
+<h1>Stocking Rate Calculator</h1>
+<p class="lede">How many animals a pasture can carry is one calculation, not a guess: acres, how much forage they grow, how much of that you're willing to take, and how much one animal eats. This does the math; you supply the one number only your land can give you.</p>
+<h2>What &quot;stocking rate&quot; means</h2>
+<p>Stocking rate is usually written as AUM per acre, or its flip side, acres per AUM. An AUM (Animal Unit Month) is the forage a 1,000-pound cow and her unweaned calf eat in a month: 750 pounds of air-dry forage, built from cattle eating about 2.5% of their body weight a day. Every other animal is converted to a fraction of that one reference animal, called its Animal Unit Equivalent (AUE).</p>
+
+<div class="calcbox">
+  <div class="calc-row">
+    <label>Pasture size (acres)<input type="number" id="c-acres" min="0.1" step="any" value="40"></label>
+    <label>Forage produced (lb/acre for the grazing period)<input type="number" id="c-forage" min="1" step="any" value="2000"></label>
+  </div>
+  <div class="calc-row">
+    <label>Utilization rate
+      <select id="c-util">
+        <option value="0.25">25% (conservative / arid rangeland)</option>
+        <option value="0.5" selected>50% ("take half, leave half", standard)</option>
+        <option value="0.6">60% (intensive rotational grazing)</option>
+      </select>
+    </label>
+    <label>Animal
+      <select id="c-species">
+        <option value="1.00" selected>Cow (1,000 lb) with calf</option>
+        <option value="1.35">Bull, mature</option>
+        <option value="0.60">Cattle, 1 year old</option>
+        <option value="0.80">Cattle, 2 years old</option>
+        <option value="1.25">Horse, mature</option>
+        <option value="0.20">Sheep, mature</option>
+        <option value="0.15">Lamb, 1 year old</option>
+        <option value="0.15">Goat, mature</option>
+      </select>
+    </label>
+  </div>
+  <div class="calc-row">
+    <label>Head count<input type="number" id="c-head" min="1" step="1" value="20"></label>
+    <label>Grazing period (days)<input type="number" id="c-days" min="1" step="1" value="90"></label>
+  </div>
+  <button type="button" id="c-run" class="btn" style="margin-top:4px;">Calculate</button>
+  <div id="c-out" class="calc-out" aria-live="polite"></div>
+</div>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return Math.round(n*100)/100;}
+  function run(){
+    var acres=parseFloat($('c-acres').value)||0;
+    var forage=parseFloat($('c-forage').value)||0;
+    var util=parseFloat($('c-util').value)||0.5;
+    var aue=parseFloat($('c-species').value)||1;
+    var head=parseFloat($('c-head').value)||0;
+    var days=parseFloat($('c-days').value)||0;
+    var out=$('c-out');
+    if(acres<=0||forage<=0||head<=0||days<=0){
+      out.innerHTML='<p class="warn">Enter a value greater than zero in every field.</p>';
+      return;
+    }
+    var usableLbs=acres*forage*util;
+    var aumsAvailable=usableLbs/750;
+    var aumsNeeded=head*aue*(days/30.4);
+    var ratePerAcre=aumsAvailable/acres;
+    var maxHead=Math.floor(aumsAvailable/(aue*(days/30.4)));
+    var maxDays=Math.floor((aumsAvailable/(aue*head))*30.4);
+    var pct=fmt((aumsNeeded/aumsAvailable)*100);
+    var verdict = aumsNeeded<=aumsAvailable
+      ? '<p class="ok"><strong>Within capacity.</strong> This herd for this period uses '+pct+'% of the AUMs your entered acreage/forage/utilization make available.</p>'
+      : '<p class="warn"><strong>Over capacity.</strong> This herd for this period needs '+pct+'% of the AUMs available, more than the pasture provides at this utilization rate.</p>';
+    out.innerHTML =
+      verdict +
+      '<table class="calc-table"><tbody>'+
+      '<tr><td>Stocking rate</td><td>'+fmt(ratePerAcre)+' AUM/acre  ('+fmt(1/ratePerAcre)+' acres/AUM)</td></tr>'+
+      '<tr><td>Total AUMs available</td><td>'+fmt(aumsAvailable)+' AUM</td></tr>'+
+      '<tr><td>AUMs this herd needs</td><td>'+fmt(aumsNeeded)+' AUM for '+days+' days</td></tr>'+
+      '<tr><td>Max head for '+days+' days</td><td>'+(maxHead>0?maxHead:0)+' head</td></tr>'+
+      '<tr><td>Max days for '+head+' head</td><td>'+(maxDays>0?maxDays:0)+' days</td></tr>'+
+      '</tbody></table>'+
+      '<p class="src">AU/AUM/AUE definitions: University of Wyoming Extension B-1320. '+
+      'Your forage-per-acre number is yours to supply, see below.</p>';
+  }
+  $('c-run').addEventListener('click', run);
+  run();
+})();
+</script>
+
+<h2>Animal Unit Equivalents, by species</h2>
+<table class="aue"><thead><tr><th>Animal</th><th>AUE</th></tr></thead><tbody>
+  <tr><td>Cow (1,000 lb) with calf</td><td>1.00</td></tr>
+  <tr><td>Bull, mature</td><td>1.35</td></tr>
+  <tr><td>Cattle, 1 year old</td><td>0.60</td></tr>
+  <tr><td>Cattle, 2 years old</td><td>0.80</td></tr>
+  <tr><td>Horse, mature</td><td>1.25</td></tr>
+  <tr><td>Sheep, mature</td><td>0.20</td></tr>
+  <tr><td>Lamb, 1 year old</td><td>0.15</td></tr>
+  <tr><td>Goat, mature</td><td>0.15</td></tr>
+</tbody></table><p class="src">Source: University of Wyoming Extension B-1320, <a href="https://wyoextension.org/publications/html/B1320/">"Animal Unit Month (AUM) Concepts and Applications for Grazing Rangelands"</a>, fetched 2026-09-24.</p>
+<h2>Where the forage number has to come from</h2>
+<p>The calculator cannot see your land. &quot;Forage produced per acre&quot; swings by 10x or more between arid rangeland and irrigated pasture, and by season on the same field. The real number for your acres lives in your county NRCS office&#x27;s Ecological Site Description, or a clip-and-weigh sample you take yourself, not a table on this page. Put in a guess and you get a confident, wrong answer; put in a real number and the arithmetic above is the same math a range extension agent would do by hand.</p>
+<h2>Why &quot;take half, leave half&quot; is the default</h2>
+<p>The 50% utilization rate is not caution for its own sake. Grazing past half the standing forage slows the plant&#x27;s own regrowth, so a field pushed past that line this year carries less next year. It is the standard-guideline number, not a hard law: rotational, short-duration systems can responsibly run higher; season-long continuous grazing usually needs to run lower.</p>
+<div class="cta">
+  <div class="cta-title">Keep this log on your phone</div>
+  <p>The Field Log is a free web app. It works with no signal, keeps photos with
+  the entry, and works out paddock rest days for you. One paddock free, forever.</p>
+  <a class="btn" href="https://fscholtesdowd.github.io/regen-farm-log/">Open the free Field Log</a>
+  <a class="btn alt" href="https://wealthywellness0.gumroad.com/l/regenfieldlog">Unlock every paddock + audit PDF, $29</a>
+</div>
+<footer>
+  Regen Farm Field Log &middot; <a href="https://fscholtesdowd.github.io/regen-farm-log/">the app</a>
+  <p class="fine"><a href="https://fscholtesdowd.github.io/privacy/">Privacy policy</a> &middot; <a href="https://fscholtesdowd.github.io/terms/">Terms</a></p>
+  <p>General information about recordkeeping, not legal or certification advice.
+  Your certifier is the authority on what your operation must keep.</p>
+</footer>
+</div>
+</body>
+</html>

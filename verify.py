@@ -115,9 +115,20 @@ def offline():
 
     # --- content pages ---
     for slug in ("grazing-records", "organic-certification-paperwork",
-                 "organic-certification-recordkeeping"):
+                 "organic-certification-recordkeeping", "stocking-rate-calculator"):
         p = HERE / slug / "index.html"
         check(f"page built: {slug}", p.exists() and p.stat().st_size > 2000)
+
+    # --- stocking-rate calculator: the AUE table and the sourced formula ---
+    calc = (HERE / "stocking-rate-calculator" / "index.html").read_text(encoding="utf-8")
+    check("calculator cites its AUM/AUE source",
+          "wyoextension.org/publications/html/B1320" in calc)
+    check("calculator ships real inputs, not just prose",
+          'id="c-run"' in calc and 'id="c-acres"' in calc and 'id="c-species"' in calc)
+    check("calculator AUE table lists all 8 sourced animal types",
+          calc.count('<td>') >= 8 * 2)
+    check("calculator names the honest gap (forage number is the operator's, not ours)",
+          "cannot see your land" in calc)
     # --- the compliance page quotes the regulation COMPLETELY ---
     # The page is headed "word for word". An omitted requirement is invisible to
     # a reader and to a cross-check, because a cross-check tests what you SAID,
@@ -134,8 +145,8 @@ def offline():
     check("page does not promise the wrong count", "four things" not in paper.lower()
           and "four sentences" not in paper.lower())
 
-    check("sitemap lists 4 urls",
-          (HERE / "sitemap.xml").read_text(encoding="utf-8").count("<loc>") == 4)
+    check("sitemap lists 5 urls",
+          (HERE / "sitemap.xml").read_text(encoding="utf-8").count("<loc>") == 5)
 
     # --- programmatic-seo gate (BLOCK if the gate file is missing) ---
     gate = TOOLS / "pseo_gate.py"
@@ -177,13 +188,13 @@ def live():
     check("license.js served", s == 200 and "canAddPaddock" in b, f"got {s}")
 
     for slug in ("grazing-records", "organic-certification-paperwork",
-                 "organic-certification-recordkeeping"):
+                 "organic-certification-recordkeeping", "stocking-rate-calculator"):
         s, b = fetch(f"{BASE}/{slug}/")
         check(f"live {slug} 200 + gumroad link",
               s == 200 and "gumroad.com/l/regenfieldlog" in b, f"got {s}")
 
     s, b = fetch(f"{BASE}/sitemap.xml")
-    check("sitemap served", s == 200 and b.count("<loc>") == 4, f"got {s}")
+    check("sitemap served", s == 200 and b.count("<loc>") == 5, f"got {s}")
 
 
 def main():
