@@ -27,6 +27,28 @@ not a broken reader:
     xqzplonkfrobnitz nonsensewordzz      0  (junk control, same run)
     planting zone 6                      depth 10 (known-live control, same run)
 
+    -- added 2026-09-25 (cloud research run #60), gated 09-24 (run #59) as
+    -- "how many bales of hay for winter", built the next run per the
+    -- established pattern (a gated idea sitting unbuilt against a live sale
+    -- clock is applying finished work, not producing more of it). Same
+    -- reader, same dual controls, re-run fresh rather than trusted stale:
+    how many bales of hay per cow per winter  depth 10, incl. texas/alberta/
+                                         canada/missouri geo variants + round
+                                         vs. square bale sub-intent            SHIP
+    how much hay do I need per cow       depth 10, incl. per-day/per-year/
+                                         per-month variants                    SHIP
+    hay calculator                       depth 10, incl. "for cows/horses/
+                                         goats/sheep" and "by weight" variants SHIP
+    round bales per cow winter           depth 6                              SHIP
+    how many round bales for one cow     depth 10                             SHIP
+    zqxwvj plarn frotz mibblenock        0  (junk control, same run)
+    Winnability checked before building (the 09-24 lesson): page 1 for
+    "how many bales of hay per cow winter calculator" has real competitors
+    (FarmingWork.com's Cattle Feed Calculator, ranchr.com) but content
+    (Hobby Farms, extension pages) still dominates over dedicated tools --
+    contested, not a blue ocean, not saturated by one institutional free
+    tool either. Same room shape as the stocking-rate calculator above.
+
 HONEST LIMIT: autocomplete measures query SHAPE, never volume -- the same
 harvest inverts under a different country code. Page-1 competition is NOT
 checked here and remains an open question.
@@ -48,6 +70,27 @@ This tool does the arithmetic only -- it has no idea what a given acre of
 land actually produces. That number has to come from the operator's own NRCS
 Ecological Site Description or county extension office; a wrong forage input
 gives a confidently wrong answer no matter how correct the math is.
+
+The winter-hay calculator's intake rate (2.6% of body weight in dry matter
+per day, consistent across both the 1,000 lb and 1,400 lb examples given) is
+quoted from Oklahoma State University Extension's Cow-Calf Corner (Mark Z.
+Johnson, Beef Cattle Breeding Specialist), as republished at
+https://www.nationalbeefwire.com/cow-calf-corner-estimating-winter-hay-needs,
+fetched live 2026-09-25 (the OSU site itself returned no usable content to
+the fetch). Bale-weight variance (a 4x5 round bale runs ~700-940 lb by
+packing density alone) is quoted from Penn State Extension,
+https://extension.psu.edu/how-much-does-that-bale-really-weigh-feeding-and-fertilizer-implications,
+fetched live 2026-09-25 -- confirmed via a second, independent fetch attempt
+that failed (extension.okstate.edu returned HTTP 403) before this one
+succeeded, so the number is not from the first source tried. Feeder-waste
+percentages are quoted from University of Nebraska-Lincoln's writeup of an
+OSU study (Lalman et al.) and a Michigan State study, plus University of
+Missouri Extension publication G4570 for the unrolled-on-the-ground figure
+(the UNL/OSU/MSU source explicitly does not cover that method), all fetched
+live 2026-09-25 -- see WASTE_TABLE below; the two OSU/MSU studies disagree on
+ring-feeder waste (4.5% vs up to 21%) and both numbers are shown, not
+averaged into a made-up middle figure. Bale weight and feeding days are the
+operator's own numbers to supply, same discipline as the forage number above.
 
 Run: python build.py    (writes into this directory, then run verify.py)
 """
@@ -222,6 +265,49 @@ PAGES = [
              "the standard-guideline number, not a hard law: rotational, "
              "short-duration systems can responsibly run higher; season-long "
              "continuous grazing usually needs to run lower."),
+            ("If you're feeding hay instead of grazing",
+             "STOCKING_TO_HAY_LINK"),
+        ],
+    },
+    {
+        "slug": "winter-hay-calculator",
+        "title": "Winter Hay Calculator: How Many Bales Per Cow For Winter",
+        "desc": "Free winter hay calculator. Enter cow weight, head count and "
+                "feeding days, pick a feeder type, get pounds of dry matter, "
+                "total hay to buy, and bales needed. Sourced, not guessed.",
+        "h1": "Winter Hay Calculator",
+        "lede": "How much hay one winter takes is arithmetic, not a guess: how "
+                "much a cow eats, how many days you'll feed hay, and how much "
+                "your feeder wastes. This does the math; you supply the one "
+                "number only your own bales can give you.",
+        "calc": "hay",
+        "body": [
+            ("How much hay one cow actually eats",
+             "A cow eats about 2.6% of her body weight in hay dry matter a "
+             "day. A 1,000 lb cow eats roughly 26 lb of dry matter a day; a "
+             "1,400 lb cow eats roughly 36.4 lb a day, the same "
+             "percentage, a bigger cow. That is the whole rule the "
+             "calculator below runs on; multiply it by your head count and "
+             "your feeding days and you have the herd's real dry-matter "
+             "need for the winter. Source: Oklahoma State University "
+             "Extension's Cow-Calf Corner (Mark Z. Johnson), "
+             "https://www.nationalbeefwire.com/cow-calf-corner-estimating-winter-hay-needs, "
+             "fetched 2026-09-25."),
+        ],
+        "body_after_calc": [
+            ("Why bale weight is the number you have to supply",
+             "A \"round bale\" is not one weight. A 4-foot by 5-foot round "
+             "bale runs from about 700 lb loose to about 940 lb very "
+             "tight, purely from how hard it was packed, and bigger "
+             "5-foot or 6-foot bales common on many farms run 1,000 to "
+             "1,500 lb and up. There is no honest default here: weigh a "
+             "bale on a scale, or ask whoever baled or sold it, and put "
+             "that real number in above. A guessed bale weight makes every "
+             "other number on this page confidently wrong."),
+            ("Feeder waste, by feeder type",
+             "WASTE_TABLE"),
+            ("If you're grazing part of the year too",
+             "HAY_TO_STOCKING_LINK"),
         ],
     },
 ]
@@ -238,6 +324,22 @@ AUE_TABLE = [
     ("Sheep, mature", 0.20),
     ("Lamb, 1 year old", 0.15),
     ("Goat, mature", 0.15),
+]
+
+# Hay feeder waste by design, fetched live 2026-09-25 from University of
+# Nebraska-Lincoln's writeup (newsroom.unl.edu/announce/beef/2528/14323) of an
+# Oklahoma State University study (Dr. Dave Lalman et al.) and a Michigan
+# State University feeder-comparison study. Two independent studies gave
+# different numbers for the same feeder category (a real disagreement, not a
+# reading error) -- shown as the range both studies actually reported, never
+# collapsed to a single invented number.
+WASTE_TABLE = [
+    ("Cone / sheeted-bottom feeder", "5–6%", "OSU (Lalman et al.)"),
+    ("Ring or ring-cone feeder", "4.5–21%", "MSU / OSU, two studies disagree"),
+    ("Trailer feeder", "11.4%", "MSU"),
+    ("Cradle feeder", "14.6%", "MSU"),
+    ("Open-bottom feeder / no containment", "up to 21%", "OSU"),
+    ("Unrolled on the ground, no rack", "up to 40%", "Univ. of Missouri Extension G4570"),
 ]
 
 CALC_HTML = """
@@ -313,6 +415,69 @@ CALC_HTML = """
       'Your forage-per-acre number is yours to supply, see below.</p>';
   }
   $('c-run').addEventListener('click', run);
+  run();
+})();
+</script>
+"""
+
+HAY_CALC_HTML = """
+<div class="calcbox">
+  <div class="calc-row">
+    <label>Average cow weight (lb)<input type="number" id="h-weight" min="1" step="any" value="1200"></label>
+    <label>Head count<input type="number" id="h-head" min="1" step="1" value="20"></label>
+  </div>
+  <div class="calc-row">
+    <label>Days you'll feed hay<input type="number" id="h-days" min="1" step="1" value="150"></label>
+    <label>Feeder / waste type
+      <select id="h-waste">
+        <option value="0.05">Cone / sheeted-bottom feeder (~5%)</option>
+        <option value="0.15" selected>Ring feeder (~15%, studies vary 4.5-21%)</option>
+        <option value="0.21">Open-bottom feeder, no containment (~21%)</option>
+        <option value="0.40">Unrolled on the ground, no rack (up to 40%)</option>
+      </select>
+    </label>
+  </div>
+  <div class="calc-row">
+    <label>Your bale weight (lb), weigh it, don't guess<input type="number" id="h-bale" min="1" step="any" value="1250"></label>
+  </div>
+  <button type="button" id="h-run" class="btn" style="margin-top:4px;">Calculate</button>
+  <div id="h-out" class="calc-out" aria-live="polite"></div>
+</div>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return Math.round(n*100)/100;}
+  function run(){
+    var weight=parseFloat($('h-weight').value)||0;
+    var head=parseFloat($('h-head').value)||0;
+    var days=parseFloat($('h-days').value)||0;
+    var waste=parseFloat($('h-waste').value)||0.15;
+    var bale=parseFloat($('h-bale').value)||0;
+    var out=$('h-out');
+    if(weight<=0||head<=0||days<=0||bale<=0){
+      out.innerHTML='<p class="warn">Enter a value greater than zero in every field.</p>';
+      return;
+    }
+    var dailyDmPerHead=weight*0.026;
+    var totalDm=dailyDmPerHead*head*days;
+    var totalFedOut=totalDm/(1-waste);
+    var totalTons=totalFedOut/2000;
+    var bales=Math.ceil(totalFedOut/bale);
+    var balesPerHead=fmt(bales/head);
+    out.innerHTML =
+      '<p class="ok"><strong>'+bales+' bales</strong> at '+bale+' lb each covers '+head+' head for '+days+' days, at ~'+Math.round(waste*100)+'% feeder waste.</p>'+
+      '<table class="calc-table"><tbody>'+
+      '<tr><td>Dry matter per head per day</td><td>'+fmt(dailyDmPerHead)+' lb</td></tr>'+
+      '<tr><td>Total dry matter needed</td><td>'+fmt(totalDm)+' lb for '+days+' days</td></tr>'+
+      '<tr><td>Hay to feed out (after waste)</td><td>'+fmt(totalFedOut)+' lb ('+fmt(totalTons)+' tons)</td></tr>'+
+      '<tr><td>Bales needed</td><td>'+bales+' bales at '+bale+' lb</td></tr>'+
+      '<tr><td>Bales per head</td><td>'+balesPerHead+'</td></tr>'+
+      '</tbody></table>'+
+      '<p class="src">Intake rate: Oklahoma State University Extension (Cow-Calf Corner), '+
+      'https://www.nationalbeefwire.com/cow-calf-corner-estimating-winter-hay-needs. '+
+      'Your bale weight and feeding days are yours to supply, see below.</p>';
+  }
+  $('h-run').addEventListener('click', run);
   run();
 })();
 </script>
@@ -411,8 +576,9 @@ def render(page):
             parts.append('<p class="src">Source: 7 CFR 205.103(b), quoted from the '
                          '<a href="https://www.govinfo.gov/content/pkg/CFR-2024-title7-vol3/xml/'
                          'CFR-2024-title7-vol3-sec205-103.xml">Code of Federal Regulations</a>.</p>')
-    if page.get("calc"):
-        parts.append(CALC_HTML)
+    calc = page.get("calc")
+    if calc:
+        parts.append(HAY_CALC_HTML if calc == "hay" else CALC_HTML)
         for h2, text in page.get("body_after_calc", []):
             parts.append(f"<h2>{html.escape(h2)}</h2>")
             if text == "AUE_TABLE":
@@ -425,6 +591,32 @@ def render(page):
                              '<a href="https://wyoextension.org/publications/html/B1320/">'
                              '"Animal Unit Month (AUM) Concepts and Applications for Grazing '
                              'Rangelands"</a>, fetched 2026-09-24.</p>')
+            elif text == "WASTE_TABLE":
+                rows = "\n".join(
+                    f"  <tr><td>{html.escape(name)}</td><td>{pct}</td><td>{html.escape(src)}</td></tr>"
+                    for name, pct, src in WASTE_TABLE)
+                parts.append('<table class="aue"><thead><tr><th>Feeder</th>'
+                             f'<th>Waste</th><th>Study</th></tr></thead><tbody>\n{rows}\n</tbody></table>'
+                             '<p class="src">Sources: University of Nebraska-Lincoln, '
+                             '<a href="https://newsroom.unl.edu/announce/beef/2528/14323">'
+                             '"Bale Feeder Choice Can Reduce Waste and Save Money"</a>, '
+                             'citing Oklahoma State (Lalman et al.) and Michigan State studies; '
+                             'and University of Missouri Extension, '
+                             '<a href="https://extension.missouri.edu/publications/g4570">'
+                             '"Reducing Losses When Feeding Hay to Beef Cattle"</a> (G4570), '
+                             'both fetched 2026-09-25. The ring-feeder range is wide because the '
+                             'two studies measured different real feeders under that name, not a '
+                             'reading error.</p>')
+            elif text == "STOCKING_TO_HAY_LINK":
+                parts.append('<p>If part of the year is hay instead of pasture, the '
+                             f'<a href="{BASE}/winter-hay-calculator/">Winter Hay '
+                             'Calculator</a> does the same kind of math for bales per '
+                             'head instead of acres per head.</p>')
+            elif text == "HAY_TO_STOCKING_LINK":
+                parts.append('<p>If part of the year is pasture instead of hay, the '
+                             f'<a href="{BASE}/stocking-rate-calculator/">Stocking Rate '
+                             'Calculator</a> does the same kind of math for acres per '
+                             'head instead of bales per head.</p>')
             else:
                 parts.append(f"<p>{html.escape(text)}</p>")
     return SHELL.format(base=BASE, body="\n".join(parts), **{

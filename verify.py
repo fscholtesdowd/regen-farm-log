@@ -115,7 +115,8 @@ def offline():
 
     # --- content pages ---
     for slug in ("grazing-records", "organic-certification-paperwork",
-                 "organic-certification-recordkeeping", "stocking-rate-calculator"):
+                 "organic-certification-recordkeeping", "stocking-rate-calculator",
+                 "winter-hay-calculator"):
         p = HERE / slug / "index.html"
         check(f"page built: {slug}", p.exists() and p.stat().st_size > 2000)
 
@@ -129,6 +130,21 @@ def offline():
           calc.count('<td>') >= 8 * 2)
     check("calculator names the honest gap (forage number is the operator's, not ours)",
           "cannot see your land" in calc)
+
+    # --- winter-hay calculator: intake rate, waste table, bale-weight honest gap ---
+    hay = (HERE / "winter-hay-calculator" / "index.html").read_text(encoding="utf-8")
+    check("hay calculator cites its intake-rate source",
+          "nationalbeefwire.com/cow-calf-corner-estimating-winter-hay-needs" in hay)
+    check("hay calculator cites its feeder-waste source",
+          "newsroom.unl.edu/announce/beef/2528/14323" in hay)
+    check("hay calculator ships real inputs, not just prose",
+          'id="h-run"' in hay and 'id="h-weight"' in hay and 'id="h-bale"' in hay)
+    check("hay calculator waste table lists all 6 sourced feeder types",
+          hay.count("<td>") >= 6 * 3)
+    check("hay calculator names the honest gap (bale weight is the operator's, not ours)",
+          "weigh it, don" in hay or "weigh a" in hay)
+    check("stocking + hay calculators cross-link each other",
+          "winter-hay-calculator" in calc and "stocking-rate-calculator/" in hay)
     # --- the compliance page quotes the regulation COMPLETELY ---
     # The page is headed "word for word". An omitted requirement is invisible to
     # a reader and to a cross-check, because a cross-check tests what you SAID,
@@ -145,8 +161,8 @@ def offline():
     check("page does not promise the wrong count", "four things" not in paper.lower()
           and "four sentences" not in paper.lower())
 
-    check("sitemap lists 5 urls",
-          (HERE / "sitemap.xml").read_text(encoding="utf-8").count("<loc>") == 5)
+    check("sitemap lists 6 urls",
+          (HERE / "sitemap.xml").read_text(encoding="utf-8").count("<loc>") == 6)
 
     # --- programmatic-seo gate (BLOCK if the gate file is missing) ---
     gate = TOOLS / "pseo_gate.py"
@@ -188,13 +204,14 @@ def live():
     check("license.js served", s == 200 and "canAddPaddock" in b, f"got {s}")
 
     for slug in ("grazing-records", "organic-certification-paperwork",
-                 "organic-certification-recordkeeping", "stocking-rate-calculator"):
+                 "organic-certification-recordkeeping", "stocking-rate-calculator",
+                 "winter-hay-calculator"):
         s, b = fetch(f"{BASE}/{slug}/")
         check(f"live {slug} 200 + gumroad link",
               s == 200 and "gumroad.com/l/regenfieldlog" in b, f"got {s}")
 
     s, b = fetch(f"{BASE}/sitemap.xml")
-    check("sitemap served", s == 200 and b.count("<loc>") == 5, f"got {s}")
+    check("sitemap served", s == 200 and b.count("<loc>") == 6, f"got {s}")
 
 
 def main():

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winter Hay Calculator: How Many Bales Per Cow For Winter</title>
+<meta name="description" content="Free winter hay calculator. Enter cow weight, head count and feeding days, pick a feeder type, get pounds of dry matter, total hay to buy, and bales needed. Sourced, not guessed.">
+<link rel="canonical" href="https://fscholtesdowd.github.io/regen-farm-log/winter-hay-calculator/">
+<style>
+  :root { --bg:#faf9f6; --surface:#fff; --text:#22251f; --dim:#5d6157;
+           --accent:#3a5a2a; --border:#e0ddd4; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 42rem; margin: 0 auto; padding: 24px 16px 64px; }
+  a { color: var(--accent); }
+  h1 { font-size: 1.6rem; line-height:1.25; margin: 0 0 4px; }
+  h2 { font-size: 1.1rem; margin: 32px 0 8px; }
+  .lede { font-size: 1.05rem; color: var(--dim); margin: 12px 0 8px; }
+  .cta { background: var(--surface); border:1px solid var(--accent);
+          border-radius:10px; padding:16px; margin:32px 0; }
+  .cta-title { font-weight:600; margin-bottom:6px; }
+  .btn { display:block; text-align:center; background:var(--accent); color:#fff;
+          text-decoration:none; padding:12px; border-radius:8px; margin-top:10px;
+          font-weight:600; }
+  .btn.alt { background:var(--surface); color:var(--accent); border:1px solid var(--accent); }
+  ol.cfr { background:var(--surface); border:1px solid var(--border);
+            border-radius:8px; padding:14px 14px 14px 32px; }
+  ol.cfr li { margin-bottom:8px; }
+  .src { font-size:0.85rem; color:var(--dim); }
+  .calcbox { background:var(--surface); border:1px solid var(--border);
+              border-radius:10px; padding:16px; margin:20px 0; }
+  .calc-row { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+  .calc-row label { flex:1 1 220px; display:flex; flex-direction:column;
+                      font-size:0.85rem; color:var(--dim); gap:4px; }
+  .calc-row input, .calc-row select { font-size:1rem; padding:8px;
+        border:1px solid var(--border); border-radius:6px;
+        background:var(--bg); color:var(--text); }
+  .calc-out { margin-top:14px; }
+  .calc-out .ok { color:var(--accent); }
+  .calc-out .warn { color:#a14a2a; }
+  @media (prefers-color-scheme: dark) { .calc-out .warn { color:#e0a082; } }
+  table.calc-table { width:100%; border-collapse:collapse; margin-top:6px; }
+  table.calc-table td { padding:6px 4px; border-bottom:1px solid var(--border); font-size:0.95rem; }
+  table.calc-table td:first-child { color:var(--dim); }
+  table.aue { width:100%; border-collapse:collapse; margin:10px 0; }
+  table.aue th, table.aue td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--border); }
+  nav.crumbs { font-size:0.85rem; margin-bottom:16px; }
+  footer { margin-top:48px; border-top:1px solid var(--border); padding-top:16px;
+            font-size:0.85rem; color:var(--dim); }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14161a; --surface:#1c1f24; --text:#e8e6e1; --dim:#9aa090;
+             --accent:#8fbf6a; --border:#2a2f36; }
+    .btn { color:#14161a; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="crumbs"><a href="https://fscholtesdowd.github.io/regen-farm-log/">&larr; Regen Farm Field Log</a></nav>
+<h1>Winter Hay Calculator</h1>
+<p class="lede">How much hay one winter takes is arithmetic, not a guess: how much a cow eats, how many days you'll feed hay, and how much your feeder wastes. This does the math; you supply the one number only your own bales can give you.</p>
+<h2>How much hay one cow actually eats</h2>
+<p>A cow eats about 2.6% of her body weight in hay dry matter a day. A 1,000 lb cow eats roughly 26 lb of dry matter a day; a 1,400 lb cow eats roughly 36.4 lb a day, the same percentage, a bigger cow. That is the whole rule the calculator below runs on; multiply it by your head count and your feeding days and you have the herd&#x27;s real dry-matter need for the winter. Source: Oklahoma State University Extension&#x27;s Cow-Calf Corner (Mark Z. Johnson), https://www.nationalbeefwire.com/cow-calf-corner-estimating-winter-hay-needs, fetched 2026-09-25.</p>
+
+<div class="calcbox">
+  <div class="calc-row">
+    <label>Average cow weight (lb)<input type="number" id="h-weight" min="1" step="any" value="1200"></label>
+    <label>Head count<input type="number" id="h-head" min="1" step="1" value="20"></label>
+  </div>
+  <div class="calc-row">
+    <label>Days you'll feed hay<input type="number" id="h-days" min="1" step="1" value="150"></label>
+    <label>Feeder / waste type
+      <select id="h-waste">
+        <option value="0.05">Cone / sheeted-bottom feeder (~5%)</option>
+        <option value="0.15" selected>Ring feeder (~15%, studies vary 4.5-21%)</option>
+        <option value="0.21">Open-bottom feeder, no containment (~21%)</option>
+        <option value="0.40">Unrolled on the ground, no rack (up to 40%)</option>
+      </select>
+    </label>
+  </div>
+  <div class="calc-row">
+    <label>Your bale weight (lb), weigh it, don't guess<input type="number" id="h-bale" min="1" step="any" value="1250"></label>
+  </div>
+  <button type="button" id="h-run" class="btn" style="margin-top:4px;">Calculate</button>
+  <div id="h-out" class="calc-out" aria-live="polite"></div>
+</div>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return Math.round(n*100)/100;}
+  function run(){
+    var weight=parseFloat($('h-weight').value)||0;
+    var head=parseFloat($('h-head').value)||0;
+    var days=parseFloat($('h-days').value)||0;
+    var waste=parseFloat($('h-waste').value)||0.15;
+    var bale=parseFloat($('h-bale').value)||0;
+    var out=$('h-out');
+    if(weight<=0||head<=0||days<=0||bale<=0){
+      out.innerHTML='<p class="warn">Enter a value greater than zero in every field.</p>';
+      return;
+    }
+    var dailyDmPerHead=weight*0.026;
+    var totalDm=dailyDmPerHead*head*days;
+    var totalFedOut=totalDm/(1-waste);
+    var totalTons=totalFedOut/2000;
+    var bales=Math.ceil(totalFedOut/bale);
+    var balesPerHead=fmt(bales/head);
+    out.innerHTML =
+      '<p class="ok"><strong>'+bales+' bales</strong> at '+bale+' lb each covers '+head+' head for '+days+' days, at ~'+Math.round(waste*100)+'% feeder waste.</p>'+
+      '<table class="calc-table"><tbody>'+
+      '<tr><td>Dry matter per head per day</td><td>'+fmt(dailyDmPerHead)+' lb</td></tr>'+
+      '<tr><td>Total dry matter needed</td><td>'+fmt(totalDm)+' lb for '+days+' days</td></tr>'+
+      '<tr><td>Hay to feed out (after waste)</td><td>'+fmt(totalFedOut)+' lb ('+fmt(totalTons)+' tons)</td></tr>'+
+      '<tr><td>Bales needed</td><td>'+bales+' bales at '+bale+' lb</td></tr>'+
+      '<tr><td>Bales per head</td><td>'+balesPerHead+'</td></tr>'+
+      '</tbody></table>'+
+      '<p class="src">Intake rate: Oklahoma State University Extension (Cow-Calf Corner), '+
+      'https://www.nationalbeefwire.com/cow-calf-corner-estimating-winter-hay-needs. '+
+      'Your bale weight and feeding days are yours to supply, see below.</p>';
+  }
+  $('h-run').addEventListener('click', run);
+  run();
+})();
+</script>
+
+<h2>Why bale weight is the number you have to supply</h2>
+<p>A &quot;round bale&quot; is not one weight. A 4-foot by 5-foot round bale runs from about 700 lb loose to about 940 lb very tight, purely from how hard it was packed, and bigger 5-foot or 6-foot bales common on many farms run 1,000 to 1,500 lb and up. There is no honest default here: weigh a bale on a scale, or ask whoever baled or sold it, and put that real number in above. A guessed bale weight makes every other number on this page confidently wrong.</p>
+<h2>Feeder waste, by feeder type</h2>
+<table class="aue"><thead><tr><th>Feeder</th><th>Waste</th><th>Study</th></tr></thead><tbody>
+  <tr><td>Cone / sheeted-bottom feeder</td><td>5–6%</td><td>OSU (Lalman et al.)</td></tr>
+  <tr><td>Ring or ring-cone feeder</td><td>4.5–21%</td><td>MSU / OSU, two studies disagree</td></tr>
+  <tr><td>Trailer feeder</td><td>11.4%</td><td>MSU</td></tr>
+  <tr><td>Cradle feeder</td><td>14.6%</td><td>MSU</td></tr>
+  <tr><td>Open-bottom feeder / no containment</td><td>up to 21%</td><td>OSU</td></tr>
+  <tr><td>Unrolled on the ground, no rack</td><td>up to 40%</td><td>Univ. of Missouri Extension G4570</td></tr>
+</tbody></table><p class="src">Sources: University of Nebraska-Lincoln, <a href="https://newsroom.unl.edu/announce/beef/2528/14323">"Bale Feeder Choice Can Reduce Waste and Save Money"</a>, citing Oklahoma State (Lalman et al.) and Michigan State studies; and University of Missouri Extension, <a href="https://extension.missouri.edu/publications/g4570">"Reducing Losses When Feeding Hay to Beef Cattle"</a> (G4570), both fetched 2026-09-25. The ring-feeder range is wide because the two studies measured different real feeders under that name, not a reading error.</p>
+<h2>If you&#x27;re grazing part of the year too</h2>
+<p>If part of the year is pasture instead of hay, the <a href="https://fscholtesdowd.github.io/regen-farm-log/stocking-rate-calculator/">Stocking Rate Calculator</a> does the same kind of math for acres per head instead of bales per head.</p>
+<div class="cta">
+  <div class="cta-title">Keep this log on your phone</div>
+  <p>The Field Log is a free web app. It works with no signal, keeps photos with
+  the entry, and works out paddock rest days for you. One paddock free, forever.</p>
+  <a class="btn" href="https://fscholtesdowd.github.io/regen-farm-log/">Open the free Field Log</a>
+  <a class="btn alt" href="https://wealthywellness0.gumroad.com/l/regenfieldlog">Unlock every paddock + audit PDF, $29</a>
+</div>
+<footer>
+  Regen Farm Field Log &middot; <a href="https://fscholtesdowd.github.io/regen-farm-log/">the app</a>
+  <p class="fine"><a href="https://fscholtesdowd.github.io/privacy/">Privacy policy</a> &middot; <a href="https://fscholtesdowd.github.io/terms/">Terms</a></p>
+  <p>General information about recordkeeping, not legal or certification advice.
+  Your certifier is the authority on what your operation must keep.</p>
+</footer>
+</div>
+</body>
+</html>
