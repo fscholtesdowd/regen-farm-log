@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creep Feed Calculator: Is Creep Feeding Your Calves Profitable</title>
+<meta name="description" content="Free creep feed calculator. Enter your feed cost, forage quality, and expected weights/prices, get cost of gain vs value of gain and a straight profit or loss verdict. Sourced, not guessed.">
+<link rel="canonical" href="https://fscholtesdowd.github.io/regen-farm-log/creep-feed-calculator/">
+<style>
+  :root { --bg:#faf9f6; --surface:#fff; --text:#22251f; --dim:#5d6157;
+           --accent:#3a5a2a; --border:#e0ddd4; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 42rem; margin: 0 auto; padding: 24px 16px 64px; }
+  a { color: var(--accent); }
+  h1 { font-size: 1.6rem; line-height:1.25; margin: 0 0 4px; }
+  h2 { font-size: 1.1rem; margin: 32px 0 8px; }
+  .lede { font-size: 1.05rem; color: var(--dim); margin: 12px 0 8px; }
+  .cta { background: var(--surface); border:1px solid var(--accent);
+          border-radius:10px; padding:16px; margin:32px 0; }
+  .cta-title { font-weight:600; margin-bottom:6px; }
+  .btn { display:block; text-align:center; background:var(--accent); color:#fff;
+          text-decoration:none; padding:12px; border-radius:8px; margin-top:10px;
+          font-weight:600; }
+  .btn.alt { background:var(--surface); color:var(--accent); border:1px solid var(--accent); }
+  ol.cfr { background:var(--surface); border:1px solid var(--border);
+            border-radius:8px; padding:14px 14px 14px 32px; }
+  ol.cfr li { margin-bottom:8px; }
+  .src { font-size:0.85rem; color:var(--dim); }
+  .calcbox { background:var(--surface); border:1px solid var(--border);
+              border-radius:10px; padding:16px; margin:20px 0; }
+  .calc-row { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+  .calc-row label { flex:1 1 220px; display:flex; flex-direction:column;
+                      font-size:0.85rem; color:var(--dim); gap:4px; }
+  .calc-row input, .calc-row select { font-size:1rem; padding:8px;
+        border:1px solid var(--border); border-radius:6px;
+        background:var(--bg); color:var(--text); }
+  .calc-out { margin-top:14px; }
+  .calc-out .ok { color:var(--accent); }
+  .calc-out .warn { color:#a14a2a; }
+  @media (prefers-color-scheme: dark) { .calc-out .warn { color:#e0a082; } }
+  table.calc-table { width:100%; border-collapse:collapse; margin-top:6px; }
+  table.calc-table td { padding:6px 4px; border-bottom:1px solid var(--border); font-size:0.95rem; }
+  table.calc-table td:first-child { color:var(--dim); }
+  table.aue { width:100%; border-collapse:collapse; margin:10px 0; }
+  table.aue th, table.aue td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--border); }
+  nav.crumbs { font-size:0.85rem; margin-bottom:16px; }
+  footer { margin-top:48px; border-top:1px solid var(--border); padding-top:16px;
+            font-size:0.85rem; color:var(--dim); }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14161a; --surface:#1c1f24; --text:#e8e6e1; --dim:#9aa090;
+             --accent:#8fbf6a; --border:#2a2f36; }
+    .btn { color:#14161a; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="crumbs"><a href="https://fscholtesdowd.github.io/regen-farm-log/">&larr; Regen Farm Field Log</a></nav>
+<h1>Creep Feed Calculator</h1>
+<p class="lede">Creep feeding only pays when the value of the extra weight beats what it cost to put on. This does that math; you supply the two numbers only your feed bill and your buyer can give you.</p>
+<h2>The one question creep feeding actually answers</h2>
+<p>Creep feeding calves extra grain while they&#x27;re still nursing puts on weight before weaning. Whether that&#x27;s worth doing comes down to one comparison: does the value of the extra pounds beat what the feed to grow them cost? Everything below is that one comparison, done with your numbers instead of a guess.</p>
+
+<div class="calcbox">
+  <div class="calc-row">
+    <label>Feed cost ($/ton)<input type="number" id="k-feedcost" min="1" step="any" value="350"></label>
+    <label>Forage quality
+      <select id="k-quality">
+        <option value="4.4">High-quality forage (lush pasture)</option>
+        <option value="8.4" selected>Moderate-quality forage</option>
+        <option value="12.5">Low-quality forage (dry, dormant)</option>
+      </select>
+    </label>
+  </div>
+  <div class="calc-row">
+    <label>Base (weaning) weight (lb)<input type="number" id="k-baseweight" min="1" step="any" value="500"></label>
+    <label>Sale price at base weight ($/lb)<input type="number" id="k-baseprice" min="0.01" step="any" value="1.80"></label>
+  </div>
+  <div class="calc-row">
+    <label>Expected added gain from creep feeding (lb)<input type="number" id="k-gain" min="1" step="any" value="50"></label>
+    <label>Sale price at the heavier weight ($/lb)<input type="number" id="k-heavyprice" min="0.01" step="any" value="1.70"></label>
+  </div>
+  <button type="button" id="k-run" class="btn" style="margin-top:4px;">Calculate</button>
+  <div id="k-out" class="calc-out" aria-live="polite"></div>
+</div>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return Math.round(n*100)/100;}
+  function run(){
+    var feedcost=parseFloat($('k-feedcost').value)||0;
+    var conv=parseFloat($('k-quality').value)||8.4;
+    var baseweight=parseFloat($('k-baseweight').value)||0;
+    var baseprice=parseFloat($('k-baseprice').value)||0;
+    var gain=parseFloat($('k-gain').value)||0;
+    var heavyprice=parseFloat($('k-heavyprice').value)||0;
+    var out=$('k-out');
+    if(feedcost<=0||baseweight<=0||baseprice<=0||gain<=0||heavyprice<=0){
+      out.innerHTML='<p class="warn">Enter a value greater than zero in every field.</p>';
+      return;
+    }
+    var feedCostPerLb=feedcost/2000;
+    var costOfGainPerLb=feedCostPerLb*conv;
+    var totalFeedCost=costOfGainPerLb*gain;
+    var heavyweight=baseweight+gain;
+    var baseRevenue=baseweight*baseprice;
+    var heavyRevenue=heavyweight*heavyprice;
+    var valueOfGainTotal=heavyRevenue-baseRevenue;
+    var valueOfGainPerLb=valueOfGainTotal/gain;
+    var netProfit=valueOfGainTotal-totalFeedCost;
+    var verdict = netProfit>0
+      ? '<p class="ok"><strong>Profitable.</strong> Value of gain ($'+fmt(valueOfGainPerLb)+'/lb) beats cost of gain ($'+fmt(costOfGainPerLb)+'/lb) on these numbers.</p>'
+      : '<p class="warn"><strong>Not profitable.</strong> Cost of gain ($'+fmt(costOfGainPerLb)+'/lb) beats value of gain ($'+fmt(valueOfGainPerLb)+'/lb) on these numbers.</p>';
+    out.innerHTML =
+      verdict +
+      '<table class="calc-table"><tbody>'+
+      '<tr><td>Feed cost per lb</td><td>$'+fmt(feedCostPerLb)+'/lb</td></tr>'+
+      '<tr><td>Cost of gain</td><td>$'+fmt(costOfGainPerLb)+'/lb ('+conv+' : 1 conversion)</td></tr>'+
+      '<tr><td>Total feed cost for '+gain+' lb gain</td><td>$'+fmt(totalFeedCost)+'</td></tr>'+
+      '<tr><td>Value of gain</td><td>$'+fmt(valueOfGainPerLb)+'/lb</td></tr>'+
+      '<tr><td>Total value of the added weight</td><td>$'+fmt(valueOfGainTotal)+'</td></tr>'+
+      '<tr><td>Net profit/loss</td><td>$'+fmt(netProfit)+' per head</td></tr>'+
+      '</tbody></table>'+
+      '<p class="src">Decision rule + forage-quality conversions: South Dakota '+
+      'State University Extension, extension.sdstate.edu/considering-creep-feeding. '+
+      'Your feed cost, forage quality, weights and prices are yours to supply.</p>';
+  }
+  $('k-run').addEventListener('click', run);
+  run();
+})();
+</script>
+
+<h2>Feed conversion, by forage quality</h2>
+<table class="aue"><thead><tr><th>Forage</th><th>Feed : gain</th></tr></thead><tbody>
+  <tr><td>High-quality forage (lush pasture)</td><td>4.4 : 1</td></tr>
+  <tr><td>Moderate-quality forage</td><td>8.4 : 1</td></tr>
+  <tr><td>Low-quality forage (dry, dormant)</td><td>12.5 : 1</td></tr>
+</tbody></table><p class="src">Source: South Dakota State University Extension, <a href="https://extension.sdstate.edu/considering-creep-feeding">"Considering Creep Feeding"</a>, fetched 2026-09-27. A second study, Ohio State University Extension’s BEEF Cattle Letter, <a href="https://u.osu.edu/beef/2000/05/10/is-creep-feed-cost-effective/">"Is Creep Feed Cost Effective?"</a>, gives a flatter 8-to-1 conversion -- a different framing, shown separately rather than blended in.</p>
+<h2>Why your sale price per pound isn&#x27;t the same at both weights</h2>
+<p>Heavier calves usually sell for a lower price per pound than lighter ones -- so the value of the extra weight is smaller than it looks at first. South Dakota State University Extension gives a worked example: “if a 530 lb. calf sells for $1.80/lb. and a 580 lb. calf sells for $1.70/lb. the value of the additional gain is actually less than the price received per pound. In that, since the 530 lb. calf sold for $950 and the 580 lb. calf sold for $986 the difference is $36/head, which when divided by a weight difference of 50 lb. arrives at a value of $0.72/lb. for each additional pound of gain.” The calculator above does that same division on your own two weights and prices.</p>
+<h2>The decision rule</h2>
+<p>South Dakota State University Extension states it plainly: creep feed should only be offered when the value of gain is greater than the cost of gain. A second source, Ohio State University Extension&#x27;s BEEF Cattle Letter, works the cost side with a flatter 8-to-1 feed conversion (against roughly 4-to-1 for a weaned-only calf) -- a different framing, not blended into the table above, shown so the two studies&#x27; numbers stay visible instead of averaged into one made-up figure.</p>
+<h2>The honest gap: your feed cost and your buyer&#x27;s price are yours to supply</h2>
+<p>The calculator cannot see your feed bill or your local market. Feed cost per ton, the forage-quality band your pasture actually is, and the two sale prices are real numbers only you or your buyer can give -- weigh, price-check, and don&#x27;t guess, same discipline as the bale weight above.</p>
+<h2>More farm-math tools</h2>
+<p>The <a href="https://fscholtesdowd.github.io/regen-farm-log/stocking-rate-calculator/">Stocking Rate Calculator</a> works out how many head your pasture carries; the <a href="https://fscholtesdowd.github.io/regen-farm-log/winter-hay-calculator/">Winter Hay Calculator</a> works out how many bales one winter takes.</p>
+<div class="cta">
+  <div class="cta-title">Keep this log on your phone</div>
+  <p>The Field Log is a free web app. It works with no signal, keeps photos with
+  the entry, and works out paddock rest days for you. One paddock free, forever.</p>
+  <a class="btn" href="https://fscholtesdowd.github.io/regen-farm-log/">Open the free Field Log</a>
+  <a class="btn alt" href="https://wealthywellness0.gumroad.com/l/regenfieldlog">Unlock every paddock + audit PDF, $29</a>
+</div>
+<footer>
+  Regen Farm Field Log &middot; <a href="https://fscholtesdowd.github.io/regen-farm-log/">the app</a>
+  <p class="fine"><a href="https://fscholtesdowd.github.io/privacy/">Privacy policy</a> &middot; <a href="https://fscholtesdowd.github.io/terms/">Terms</a></p>
+  <p>General information about recordkeeping, not legal or certification advice.
+  Your certifier is the authority on what your operation must keep.</p>
+</footer>
+</div>
+</body>
+</html>

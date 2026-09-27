@@ -116,7 +116,7 @@ def offline():
     # --- content pages ---
     for slug in ("grazing-records", "organic-certification-paperwork",
                  "organic-certification-recordkeeping", "stocking-rate-calculator",
-                 "winter-hay-calculator"):
+                 "winter-hay-calculator", "creep-feed-calculator"):
         p = HERE / slug / "index.html"
         check(f"page built: {slug}", p.exists() and p.stat().st_size > 2000)
 
@@ -145,6 +145,23 @@ def offline():
           "weigh it, don" in hay or "weigh a" in hay)
     check("stocking + hay calculators cross-link each other",
           "winter-hay-calculator" in calc and "stocking-rate-calculator/" in hay)
+
+    # --- creep-feed calculator: forage-conversion table, honest gap, cross-links ---
+    creep = (HERE / "creep-feed-calculator" / "index.html").read_text(encoding="utf-8")
+    check("creep calculator cites its conversion/decision-rule source",
+          "extension.sdstate.edu/considering-creep-feeding" in creep)
+    check("creep calculator cites its second (disagreeing) source",
+          "u.osu.edu/beef/2000/05/10/is-creep-feed-cost-effective" in creep)
+    check("creep calculator ships real inputs, not just prose",
+          'id="k-run"' in creep and 'id="k-feedcost"' in creep and 'id="k-quality"' in creep)
+    check("creep calculator conversion table lists all 3 sourced forage rows",
+          creep.count("<td>") >= 3 * 2)
+    check("creep calculator names the honest gap (feed cost + prices are the operator's, not ours)",
+          "yours to supply" in creep)
+    check("creep calculator cross-links the other 2 calculators",
+          "stocking-rate-calculator" in creep and "winter-hay-calculator" in creep)
+    check("app footer links the creep-feed calculator",
+          "creep-feed-calculator/" in index)
     # --- the compliance page quotes the regulation COMPLETELY ---
     # The page is headed "word for word". An omitted requirement is invisible to
     # a reader and to a cross-check, because a cross-check tests what you SAID,
@@ -161,8 +178,8 @@ def offline():
     check("page does not promise the wrong count", "four things" not in paper.lower()
           and "four sentences" not in paper.lower())
 
-    check("sitemap lists 6 urls",
-          (HERE / "sitemap.xml").read_text(encoding="utf-8").count("<loc>") == 6)
+    check("sitemap lists 7 urls",
+          (HERE / "sitemap.xml").read_text(encoding="utf-8").count("<loc>") == 7)
 
     # --- programmatic-seo gate (BLOCK if the gate file is missing) ---
     gate = TOOLS / "pseo_gate.py"
@@ -205,13 +222,13 @@ def live():
 
     for slug in ("grazing-records", "organic-certification-paperwork",
                  "organic-certification-recordkeeping", "stocking-rate-calculator",
-                 "winter-hay-calculator"):
+                 "winter-hay-calculator", "creep-feed-calculator"):
         s, b = fetch(f"{BASE}/{slug}/")
         check(f"live {slug} 200 + gumroad link",
               s == 200 and "gumroad.com/l/regenfieldlog" in b, f"got {s}")
 
     s, b = fetch(f"{BASE}/sitemap.xml")
-    check("sitemap served", s == 200 and b.count("<loc>") == 6, f"got {s}")
+    check("sitemap served", s == 200 and b.count("<loc>") == 7, f"got {s}")
 
 
 def main():

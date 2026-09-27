@@ -49,6 +49,24 @@ not a broken reader:
     contested, not a blue ocean, not saturated by one institutional free
     tool either. Same room shape as the stocking-rate calculator above.
 
+    -- added 2026-09-27 (cloud research run #61), gated 09-25 (run #60) as
+    -- "creep-feeding profitability calculator", re-probed fresh rather than
+    -- trusted stale per this file's own falsifiability discipline (the
+    -- instrument's own --selftest run clean first, positive/negative both
+    -- correct in the same session):
+    creep feed calculator                depth 6, incl. "for cattle/horses"
+                                         sub-intent                          SHIP
+    how much creep feed per calf         depth 4                             SHIP
+    creep feeding cost calculator        depth 0                             DROPPED (bare
+                                         phrase, no exact-match autocomplete)
+    creep feed cost per pound of gain    depth 0                             DROPPED
+    zqxwvj plarn frotz mibblenock        0  (junk control, same run)
+    Winnability checked BEFORE building (the 09-24/09-25 lesson, applied a
+    3rd time): WebSearch on "creep feed calculator cost per pound of gain"
+    -- page 1 is entirely university extension content (UGA, Alabama, Ohio
+    State, Penn State, Oklahoma State, SDSU, Cattlytics) and zero dedicated
+    calculator tools -- more open than either calculator already shipped.
+
 HONEST LIMIT: autocomplete measures query SHAPE, never volume -- the same
 harvest inverts under a different country code. Page-1 competition is NOT
 checked here and remains an open question.
@@ -91,6 +109,26 @@ live 2026-09-25 -- see WASTE_TABLE below; the two OSU/MSU studies disagree on
 ring-feeder waste (4.5% vs up to 21%) and both numbers are shown, not
 averaged into a made-up middle figure. Bale weight and feeding days are the
 operator's own numbers to supply, same discipline as the forage number above.
+
+The creep-feed calculator's feed-conversion-by-forage-quality table (4.4:1 on
+high-quality forage, 8.4:1 on moderate, 12.5:1 on low) and its value-of-gain
+worked example (a 530 lb calf at $1.80/lb vs a 580 lb calf at $1.70/lb, quoted
+verbatim including the source's own $950/$986/$36/$0.72 figures -- 530x1.80
+actually equals $954, a small rounding in the source's own text, not fixed
+here per the CFR-bullets discipline of quoting word for word rather than
+correcting a source) are quoted from South Dakota State University Extension,
+https://extension.sdstate.edu/considering-creep-feeding, fetched live
+2026-09-27. A second source, Ohio State University Extension's BEEF Cattle
+Letter (https://u.osu.edu/beef/2000/05/10/is-creep-feed-cost-effective/,
+fetched live 2026-09-27), gives a flat 8-to-1 conversion for a creep-fed calf
+against 4-to-1 for a weaned-only calf -- a different framing (whole-system
+comparison, not by forage quality) shown as a second, disagreeing data point
+rather than blended into the SDSU table, same discipline as the winter-hay
+calculator's ring-feeder waste range above. This tool does the arithmetic
+only -- feed cost per ton, expected sale prices at two weights, and which
+forage-quality band your pasture is are the operator's own numbers; a wrong
+one gives a confidently wrong profit/loss verdict no matter how correct the
+math is.
 
 Run: python build.py    (writes into this directory, then run verify.py)
 """
@@ -310,6 +348,65 @@ PAGES = [
              "HAY_TO_STOCKING_LINK"),
         ],
     },
+    {
+        "slug": "creep-feed-calculator",
+        "title": "Creep Feed Calculator: Is Creep Feeding Your Calves Profitable",
+        "desc": "Free creep feed calculator. Enter your feed cost, forage "
+                "quality, and expected weights/prices, get cost of gain vs "
+                "value of gain and a straight profit or loss verdict. "
+                "Sourced, not guessed.",
+        "h1": "Creep Feed Calculator",
+        "lede": "Creep feeding only pays when the value of the extra weight "
+                "beats what it cost to put on. This does that math; you "
+                "supply the two numbers only your feed bill and your buyer "
+                "can give you.",
+        "calc": "creep",
+        "body": [
+            ("The one question creep feeding actually answers",
+             "Creep feeding calves extra grain while they're still nursing "
+             "puts on weight before weaning. Whether that's worth doing "
+             "comes down to one comparison: does the value of the extra "
+             "pounds beat what the feed to grow them cost? Everything below "
+             "is that one comparison, done with your numbers instead of a "
+             "guess."),
+        ],
+        "body_after_calc": [
+            ("Feed conversion, by forage quality",
+             "CONVERSION_TABLE"),
+            ("Why your sale price per pound isn't the same at both weights",
+             "Heavier calves usually sell for a lower price per pound than "
+             "lighter ones -- so the value of the extra weight is smaller "
+             "than it looks at first. South Dakota State University "
+             "Extension gives a worked example: “if a 530 lb. calf "
+             "sells for $1.80/lb. and a 580 lb. calf sells for $1.70/lb. "
+             "the value of the additional gain is actually less than the "
+             "price received per pound. In that, since the 530 lb. calf "
+             "sold for $950 and the 580 lb. calf sold for $986 the "
+             "difference is $36/head, which when divided by a weight "
+             "difference of 50 lb. arrives at a value of $0.72/lb. for "
+             "each additional pound of gain.” The calculator above does "
+             "that same division on your own two weights and prices."),
+            ("The decision rule",
+             "South Dakota State University Extension states it plainly: "
+             "creep feed should only be offered when the value of gain is "
+             "greater than the cost of gain. A second source, Ohio State "
+             "University Extension's BEEF Cattle Letter, works the cost "
+             "side with a flatter 8-to-1 feed conversion (against roughly "
+             "4-to-1 for a weaned-only calf) -- a different framing, not "
+             "blended into the table above, shown so the two studies' "
+             "numbers stay visible instead of averaged into one made-up "
+             "figure."),
+            ("The honest gap: your feed cost and your buyer's price are "
+             "yours to supply",
+             "The calculator cannot see your feed bill or your local market. "
+             "Feed cost per ton, the forage-quality band your pasture "
+             "actually is, and the two sale prices are real numbers only "
+             "you or your buyer can give -- weigh, price-check, and don't "
+             "guess, same discipline as the bale weight above."),
+            ("More farm-math tools",
+             "CALC_CROSS_LINKS"),
+        ],
+    },
 ]
 
 # Animal Unit Equivalents, University of Wyoming Extension B-1320, Table 1
@@ -333,6 +430,15 @@ AUE_TABLE = [
 # different numbers for the same feeder category (a real disagreement, not a
 # reading error) -- shown as the range both studies actually reported, never
 # collapsed to a single invented number.
+# Feed conversion by forage quality, South Dakota State University Extension
+# (extension.sdstate.edu/considering-creep-feeding), fetched live 2026-09-27:
+# lb of creep feed per lb of added gain, on high/moderate/low quality forage.
+CONVERSION_TABLE = [
+    ("High-quality forage (lush pasture)", "4.4 : 1"),
+    ("Moderate-quality forage", "8.4 : 1"),
+    ("Low-quality forage (dry, dormant)", "12.5 : 1"),
+]
+
 WASTE_TABLE = [
     ("Cone / sheeted-bottom feeder", "5–6%", "OSU (Lalman et al.)"),
     ("Ring or ring-cone feeder", "4.5–21%", "MSU / OSU, two studies disagree"),
@@ -483,6 +589,77 @@ HAY_CALC_HTML = """
 </script>
 """
 
+CREEP_CALC_HTML = """
+<div class="calcbox">
+  <div class="calc-row">
+    <label>Feed cost ($/ton)<input type="number" id="k-feedcost" min="1" step="any" value="350"></label>
+    <label>Forage quality
+      <select id="k-quality">
+        <option value="4.4">High-quality forage (lush pasture)</option>
+        <option value="8.4" selected>Moderate-quality forage</option>
+        <option value="12.5">Low-quality forage (dry, dormant)</option>
+      </select>
+    </label>
+  </div>
+  <div class="calc-row">
+    <label>Base (weaning) weight (lb)<input type="number" id="k-baseweight" min="1" step="any" value="500"></label>
+    <label>Sale price at base weight ($/lb)<input type="number" id="k-baseprice" min="0.01" step="any" value="1.80"></label>
+  </div>
+  <div class="calc-row">
+    <label>Expected added gain from creep feeding (lb)<input type="number" id="k-gain" min="1" step="any" value="50"></label>
+    <label>Sale price at the heavier weight ($/lb)<input type="number" id="k-heavyprice" min="0.01" step="any" value="1.70"></label>
+  </div>
+  <button type="button" id="k-run" class="btn" style="margin-top:4px;">Calculate</button>
+  <div id="k-out" class="calc-out" aria-live="polite"></div>
+</div>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return Math.round(n*100)/100;}
+  function run(){
+    var feedcost=parseFloat($('k-feedcost').value)||0;
+    var conv=parseFloat($('k-quality').value)||8.4;
+    var baseweight=parseFloat($('k-baseweight').value)||0;
+    var baseprice=parseFloat($('k-baseprice').value)||0;
+    var gain=parseFloat($('k-gain').value)||0;
+    var heavyprice=parseFloat($('k-heavyprice').value)||0;
+    var out=$('k-out');
+    if(feedcost<=0||baseweight<=0||baseprice<=0||gain<=0||heavyprice<=0){
+      out.innerHTML='<p class="warn">Enter a value greater than zero in every field.</p>';
+      return;
+    }
+    var feedCostPerLb=feedcost/2000;
+    var costOfGainPerLb=feedCostPerLb*conv;
+    var totalFeedCost=costOfGainPerLb*gain;
+    var heavyweight=baseweight+gain;
+    var baseRevenue=baseweight*baseprice;
+    var heavyRevenue=heavyweight*heavyprice;
+    var valueOfGainTotal=heavyRevenue-baseRevenue;
+    var valueOfGainPerLb=valueOfGainTotal/gain;
+    var netProfit=valueOfGainTotal-totalFeedCost;
+    var verdict = netProfit>0
+      ? '<p class="ok"><strong>Profitable.</strong> Value of gain ($'+fmt(valueOfGainPerLb)+'/lb) beats cost of gain ($'+fmt(costOfGainPerLb)+'/lb) on these numbers.</p>'
+      : '<p class="warn"><strong>Not profitable.</strong> Cost of gain ($'+fmt(costOfGainPerLb)+'/lb) beats value of gain ($'+fmt(valueOfGainPerLb)+'/lb) on these numbers.</p>';
+    out.innerHTML =
+      verdict +
+      '<table class="calc-table"><tbody>'+
+      '<tr><td>Feed cost per lb</td><td>$'+fmt(feedCostPerLb)+'/lb</td></tr>'+
+      '<tr><td>Cost of gain</td><td>$'+fmt(costOfGainPerLb)+'/lb ('+conv+' : 1 conversion)</td></tr>'+
+      '<tr><td>Total feed cost for '+gain+' lb gain</td><td>$'+fmt(totalFeedCost)+'</td></tr>'+
+      '<tr><td>Value of gain</td><td>$'+fmt(valueOfGainPerLb)+'/lb</td></tr>'+
+      '<tr><td>Total value of the added weight</td><td>$'+fmt(valueOfGainTotal)+'</td></tr>'+
+      '<tr><td>Net profit/loss</td><td>$'+fmt(netProfit)+' per head</td></tr>'+
+      '</tbody></table>'+
+      '<p class="src">Decision rule + forage-quality conversions: South Dakota '+
+      'State University Extension, extension.sdstate.edu/considering-creep-feeding. '+
+      'Your feed cost, forage quality, weights and prices are yours to supply.</p>';
+  }
+  $('k-run').addEventListener('click', run);
+  run();
+})();
+</script>
+"""
+
 SHELL = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -578,7 +755,8 @@ def render(page):
                          'CFR-2024-title7-vol3-sec205-103.xml">Code of Federal Regulations</a>.</p>')
     calc = page.get("calc")
     if calc:
-        parts.append(HAY_CALC_HTML if calc == "hay" else CALC_HTML)
+        parts.append(CREEP_CALC_HTML if calc == "creep" else
+                     HAY_CALC_HTML if calc == "hay" else CALC_HTML)
         for h2, text in page.get("body_after_calc", []):
             parts.append(f"<h2>{html.escape(h2)}</h2>")
             if text == "AUE_TABLE":
@@ -611,12 +789,35 @@ def render(page):
                 parts.append('<p>If part of the year is hay instead of pasture, the '
                              f'<a href="{BASE}/winter-hay-calculator/">Winter Hay '
                              'Calculator</a> does the same kind of math for bales per '
-                             'head instead of acres per head.</p>')
+                             'head instead of acres per head. Creep feeding calves on '
+                             f'this pasture? The <a href="{BASE}/creep-feed-calculator/">'
+                             'Creep Feed Calculator</a> works out whether it pays.</p>')
             elif text == "HAY_TO_STOCKING_LINK":
                 parts.append('<p>If part of the year is pasture instead of hay, the '
                              f'<a href="{BASE}/stocking-rate-calculator/">Stocking Rate '
                              'Calculator</a> does the same kind of math for acres per '
-                             'head instead of bales per head.</p>')
+                             'head instead of bales per head. Creep feeding calves too? '
+                             f'The <a href="{BASE}/creep-feed-calculator/">Creep Feed '
+                             'Calculator</a> works out whether it pays.</p>')
+            elif text == "CONVERSION_TABLE":
+                rows = "\n".join(
+                    f"  <tr><td>{html.escape(name)}</td><td>{ratio}</td></tr>"
+                    for name, ratio in CONVERSION_TABLE)
+                parts.append('<table class="aue"><thead><tr><th>Forage</th>'
+                             f'<th>Feed : gain</th></tr></thead><tbody>\n{rows}\n</tbody></table>'
+                             '<p class="src">Source: South Dakota State University Extension, '
+                             '<a href="https://extension.sdstate.edu/considering-creep-feeding">'
+                             '"Considering Creep Feeding"</a>, fetched 2026-09-27. A second study, '
+                             'Ohio State University Extension’s BEEF Cattle Letter, '
+                             '<a href="https://u.osu.edu/beef/2000/05/10/is-creep-feed-cost-effective/">'
+                             '"Is Creep Feed Cost Effective?"</a>, gives a flatter 8-to-1 conversion '
+                             '-- a different framing, shown separately rather than blended in.</p>')
+            elif text == "CALC_CROSS_LINKS":
+                parts.append('<p>The '
+                             f'<a href="{BASE}/stocking-rate-calculator/">Stocking Rate '
+                             'Calculator</a> works out how many head your pasture carries; the '
+                             f'<a href="{BASE}/winter-hay-calculator/">Winter Hay Calculator</a> '
+                             'works out how many bales one winter takes.</p>')
             else:
                 parts.append(f"<p>{html.escape(text)}</p>")
     return SHELL.format(base=BASE, body="\n".join(parts), **{
