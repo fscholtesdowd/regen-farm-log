@@ -130,6 +130,41 @@ forage-quality band your pasture is are the operator's own numbers; a wrong
 one gives a confidently wrong profit/loss verdict no matter how correct the
 math is.
 
+-- added 2026-09-28 (cloud research run #62). Two candidates in the same
+-- calculator word family, same reader, same dual controls, re-run fresh:
+rotational grazing calculator        depth 6 (sheep/cattle-per-acre
+                                     sub-intent)                            KILLED on winnability
+                                     -- WebSearch page 1: Arkansas Extension
+                                     PLUS 4 dedicated calculator sites
+                                     (FarmCalcs, Farm Planner Online,
+                                     AgentCalc, growandstore/
+                                     completecalculators) -- saturated,
+                                     same shape as the 09-24 cover-crop and
+                                     09-25 livestock-water kills.
+manure application rate calculator   depth 5 (fertiliser/slurry/liquid
+                                     manure sub-intent)                     SHIP
+zqxwvj plarn frotz mibblenock        0  (junk control, same run)
+Winnability checked before building: WebSearch page 1 for "manure
+application rate calculator per acre" is worksheets/PDFs from 5 university
+extensions (Oklahoma State, Minnesota, Michigan State, Nebraska-Lincoln,
+Missouri/erams) plus ONE generic calculator-farm site (calculatorultra.com)
+-- contested by content, not saturated by an institutional free tool, same
+room shape as the stocking-rate and winter-hay calculators that shipped.
+
+The manure application calculator's load-area method (spreader load size
+divided by the ground area it covered, area = length x width / 43,560) is
+quoted from Penn State Extension, "Manure Spreader Calibration"
+(https://extension.psu.edu/manure-spreader-calibration, fetched live
+2026-09-28). Its tarp/sheet cross-check method and the 21.8 lb-per-sq-ft to
+tons-per-acre conversion factor (43,560 sq ft/acre divided by 2,000 lb/ton)
+are quoted from North Dakota State University Extension, "Manure Spreader
+Calibration For Nutrient Management Planning"
+(https://www.ndsu.edu/agriculture/extension/publications/manure-spreader-calibration-nutrient-management-planning,
+fetched live 2026-09-28) -- two independent sources for the two methods
+shown, not one source stretched to cover both. Load size, travel-path
+measurements and field size are the operator's own numbers to supply, same
+discipline as every calculator on this site.
+
 Run: python build.py    (writes into this directory, then run verify.py)
 """
 from pathlib import Path
@@ -407,6 +442,42 @@ PAGES = [
              "CALC_CROSS_LINKS"),
         ],
     },
+    {
+        "slug": "manure-application-calculator",
+        "title": "Manure Application Rate Calculator: Tons or Gallons Per Acre",
+        "desc": "Free manure application rate calculator. Enter your spreader "
+                "load and the ground it covered, get tons or gallons per acre, "
+                "loads needed, and total manure for the field. Sourced, not guessed.",
+        "h1": "Manure Application Rate Calculator",
+        "lede": "How much manure your spreader is putting down per acre is "
+                "arithmetic, not a guess: how big the load was and how much "
+                "ground it covered. This does the math; you supply the one "
+                "number only a tape measure or your spreader's own capacity "
+                "can give you.",
+        "calc": "manure",
+        "body": [
+            ("What \"application rate\" means",
+             "Application rate is the load divided by the area it covered: "
+             "tons per acre for solid manure, gallons per acre for liquid. "
+             "Area is travel-path length times spread width, converted from "
+             "square feet to acres by dividing by 43,560. Get the rate wrong "
+             "and you either waste nutrients and risk runoff on the high "
+             "side, or waste the trip on the low side."),
+        ],
+        "body_after_calc": [
+            ("Check it the other way: the tarp method",
+             "MANURE_TARP_METHOD"),
+            ("The honest gap: this can't see your load or your path",
+             "The calculator cannot see how full the spreader really was or "
+             "how straight you drove. Weigh a load if you can instead of "
+             "trusting the rated capacity, and measure your actual spread "
+             "width rather than guessing it -- a wrong load size or path "
+             "width gives a confidently wrong rate no matter how correct the "
+             "arithmetic is."),
+            ("More farm-math tools",
+             "MANURE_CROSS_LINKS"),
+        ],
+    },
 ]
 
 # Animal Unit Equivalents, University of Wyoming Extension B-1320, Table 1
@@ -660,6 +731,65 @@ CREEP_CALC_HTML = """
 </script>
 """
 
+MANURE_CALC_HTML = """
+<div class="calcbox">
+  <div class="calc-row">
+    <label>Manure type
+      <select id="m-unit">
+        <option value="tons" selected>Solid (tons)</option>
+        <option value="gal">Liquid (gallons)</option>
+      </select>
+    </label>
+    <label>Spreader load size<input type="number" id="m-load" min="0.01" step="any" value="6"></label>
+  </div>
+  <div class="calc-row">
+    <label>Travel path length (ft)<input type="number" id="m-length" min="1" step="any" value="2000"></label>
+    <label>Spread width (ft)<input type="number" id="m-width" min="1" step="any" value="30"></label>
+  </div>
+  <div class="calc-row">
+    <label>Field size to cover (acres)<input type="number" id="m-field" min="0.01" step="any" value="40"></label>
+  </div>
+  <button type="button" id="m-run" class="btn" style="margin-top:4px;">Calculate</button>
+  <div id="m-out" class="calc-out" aria-live="polite"></div>
+</div>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return Math.round(n*100)/100;}
+  function run(){
+    var unit=$('m-unit').value;
+    var load=parseFloat($('m-load').value)||0;
+    var length=parseFloat($('m-length').value)||0;
+    var width=parseFloat($('m-width').value)||0;
+    var field=parseFloat($('m-field').value)||0;
+    var out=$('m-out');
+    if(load<=0||length<=0||width<=0||field<=0){
+      out.innerHTML='<p class="warn">Enter a value greater than zero in every field.</p>';
+      return;
+    }
+    var label = unit==='tons' ? 'tons' : 'gallons';
+    var acresPerLoad=(length*width)/43560;
+    var ratePerAcre=load/acresPerLoad;
+    var loadsNeeded=Math.ceil(field/acresPerLoad);
+    var totalNeeded=loadsNeeded*load;
+    out.innerHTML =
+      '<p class="ok"><strong>'+fmt(ratePerAcre)+' '+label+'/acre</strong> at this load size and travel path.</p>'+
+      '<table class="calc-table"><tbody>'+
+      '<tr><td>Area covered per load</td><td>'+fmt(acresPerLoad)+' acres</td></tr>'+
+      '<tr><td>Application rate</td><td>'+fmt(ratePerAcre)+' '+label+'/acre</td></tr>'+
+      '<tr><td>Loads needed for '+field+' acres</td><td>'+loadsNeeded+' loads</td></tr>'+
+      '<tr><td>Total manure for the field</td><td>'+fmt(totalNeeded)+' '+label+'</td></tr>'+
+      '</tbody></table>'+
+      '<p class="src">Load-area method: Penn State Extension, '+
+      'extension.psu.edu/manure-spreader-calibration. '+
+      'Your load size and path measurements are yours to supply.</p>';
+  }
+  $('m-run').addEventListener('click', run);
+  run();
+})();
+</script>
+"""
+
 SHELL = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -756,7 +886,8 @@ def render(page):
     calc = page.get("calc")
     if calc:
         parts.append(CREEP_CALC_HTML if calc == "creep" else
-                     HAY_CALC_HTML if calc == "hay" else CALC_HTML)
+                     HAY_CALC_HTML if calc == "hay" else
+                     MANURE_CALC_HTML if calc == "manure" else CALC_HTML)
         for h2, text in page.get("body_after_calc", []):
             parts.append(f"<h2>{html.escape(h2)}</h2>")
             if text == "AUE_TABLE":
@@ -791,14 +922,20 @@ def render(page):
                              'Calculator</a> does the same kind of math for bales per '
                              'head instead of acres per head. Creep feeding calves on '
                              f'this pasture? The <a href="{BASE}/creep-feed-calculator/">'
-                             'Creep Feed Calculator</a> works out whether it pays.</p>')
+                             'Creep Feed Calculator</a> works out whether it pays. '
+                             f'Spreading manure on it? The <a href="{BASE}/'
+                             'manure-application-calculator/">Manure Application Rate '
+                             'Calculator</a> works out tons or gallons per acre.</p>')
             elif text == "HAY_TO_STOCKING_LINK":
                 parts.append('<p>If part of the year is pasture instead of hay, the '
                              f'<a href="{BASE}/stocking-rate-calculator/">Stocking Rate '
                              'Calculator</a> does the same kind of math for acres per '
                              'head instead of bales per head. Creep feeding calves too? '
                              f'The <a href="{BASE}/creep-feed-calculator/">Creep Feed '
-                             'Calculator</a> works out whether it pays.</p>')
+                             'Calculator</a> works out whether it pays. Spreading the '
+                             f'manure? The <a href="{BASE}/manure-application-calculator/">'
+                             'Manure Application Rate Calculator</a> works out tons or '
+                             'gallons per acre.</p>')
             elif text == "CONVERSION_TABLE":
                 rows = "\n".join(
                     f"  <tr><td>{html.escape(name)}</td><td>{ratio}</td></tr>"
@@ -817,7 +954,34 @@ def render(page):
                              f'<a href="{BASE}/stocking-rate-calculator/">Stocking Rate '
                              'Calculator</a> works out how many head your pasture carries; the '
                              f'<a href="{BASE}/winter-hay-calculator/">Winter Hay Calculator</a> '
-                             'works out how many bales one winter takes.</p>')
+                             'works out how many bales one winter takes; the '
+                             f'<a href="{BASE}/manure-application-calculator/">Manure '
+                             'Application Rate Calculator</a> works out tons or gallons '
+                             'per acre.</p>')
+            elif text == "MANURE_TARP_METHOD":
+                parts.append('<p>A second way to check your spreader, using a tarp '
+                             'instead of a measured travel path: weigh the manure that '
+                             'lands on a tarp of known size, then Rate (tons/acre) = '
+                             '(pounds on the tarp &times; 21.8) &divide; tarp area in '
+                             'square feet. 21.8 is 43,560 square feet per acre divided '
+                             'by 2,000 pounds per ton. Use a tarp sized 4′ 8″ '
+                             '&times; 4′ 8″ (21.8 square feet) and the '
+                             'pounds you weigh equal tons per acre directly, no further '
+                             'math needed.</p>'
+                             '<p class="src">Source: North Dakota State University '
+                             'Extension, "Manure Spreader Calibration For Nutrient '
+                             'Management Planning," ndsu.edu/agriculture/extension/'
+                             'publications/manure-spreader-calibration-nutrient-'
+                             'management-planning, fetched 2026-09-28.</p>')
+            elif text == "MANURE_CROSS_LINKS":
+                parts.append('<p>The '
+                             f'<a href="{BASE}/stocking-rate-calculator/">Stocking Rate '
+                             'Calculator</a> works out how many head your pasture '
+                             f'carries; the <a href="{BASE}/winter-hay-calculator/">'
+                             'Winter Hay Calculator</a> works out how many bales one '
+                             f'winter takes; the <a href="{BASE}/creep-feed-calculator/">'
+                             'Creep Feed Calculator</a> works out whether creep feeding '
+                             'pays.</p>')
             else:
                 parts.append(f"<p>{html.escape(text)}</p>")
     return SHELL.format(base=BASE, body="\n".join(parts), **{

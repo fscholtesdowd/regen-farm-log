@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manure Application Rate Calculator: Tons or Gallons Per Acre</title>
+<meta name="description" content="Free manure application rate calculator. Enter your spreader load and the ground it covered, get tons or gallons per acre, loads needed, and total manure for the field. Sourced, not guessed.">
+<link rel="canonical" href="https://fscholtesdowd.github.io/regen-farm-log/manure-application-calculator/">
+<style>
+  :root { --bg:#faf9f6; --surface:#fff; --text:#22251f; --dim:#5d6157;
+           --accent:#3a5a2a; --border:#e0ddd4; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 42rem; margin: 0 auto; padding: 24px 16px 64px; }
+  a { color: var(--accent); }
+  h1 { font-size: 1.6rem; line-height:1.25; margin: 0 0 4px; }
+  h2 { font-size: 1.1rem; margin: 32px 0 8px; }
+  .lede { font-size: 1.05rem; color: var(--dim); margin: 12px 0 8px; }
+  .cta { background: var(--surface); border:1px solid var(--accent);
+          border-radius:10px; padding:16px; margin:32px 0; }
+  .cta-title { font-weight:600; margin-bottom:6px; }
+  .btn { display:block; text-align:center; background:var(--accent); color:#fff;
+          text-decoration:none; padding:12px; border-radius:8px; margin-top:10px;
+          font-weight:600; }
+  .btn.alt { background:var(--surface); color:var(--accent); border:1px solid var(--accent); }
+  ol.cfr { background:var(--surface); border:1px solid var(--border);
+            border-radius:8px; padding:14px 14px 14px 32px; }
+  ol.cfr li { margin-bottom:8px; }
+  .src { font-size:0.85rem; color:var(--dim); }
+  .calcbox { background:var(--surface); border:1px solid var(--border);
+              border-radius:10px; padding:16px; margin:20px 0; }
+  .calc-row { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+  .calc-row label { flex:1 1 220px; display:flex; flex-direction:column;
+                      font-size:0.85rem; color:var(--dim); gap:4px; }
+  .calc-row input, .calc-row select { font-size:1rem; padding:8px;
+        border:1px solid var(--border); border-radius:6px;
+        background:var(--bg); color:var(--text); }
+  .calc-out { margin-top:14px; }
+  .calc-out .ok { color:var(--accent); }
+  .calc-out .warn { color:#a14a2a; }
+  @media (prefers-color-scheme: dark) { .calc-out .warn { color:#e0a082; } }
+  table.calc-table { width:100%; border-collapse:collapse; margin-top:6px; }
+  table.calc-table td { padding:6px 4px; border-bottom:1px solid var(--border); font-size:0.95rem; }
+  table.calc-table td:first-child { color:var(--dim); }
+  table.aue { width:100%; border-collapse:collapse; margin:10px 0; }
+  table.aue th, table.aue td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--border); }
+  nav.crumbs { font-size:0.85rem; margin-bottom:16px; }
+  footer { margin-top:48px; border-top:1px solid var(--border); padding-top:16px;
+            font-size:0.85rem; color:var(--dim); }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14161a; --surface:#1c1f24; --text:#e8e6e1; --dim:#9aa090;
+             --accent:#8fbf6a; --border:#2a2f36; }
+    .btn { color:#14161a; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="crumbs"><a href="https://fscholtesdowd.github.io/regen-farm-log/">&larr; Regen Farm Field Log</a></nav>
+<h1>Manure Application Rate Calculator</h1>
+<p class="lede">How much manure your spreader is putting down per acre is arithmetic, not a guess: how big the load was and how much ground it covered. This does the math; you supply the one number only a tape measure or your spreader's own capacity can give you.</p>
+<h2>What &quot;application rate&quot; means</h2>
+<p>Application rate is the load divided by the area it covered: tons per acre for solid manure, gallons per acre for liquid. Area is travel-path length times spread width, converted from square feet to acres by dividing by 43,560. Get the rate wrong and you either waste nutrients and risk runoff on the high side, or waste the trip on the low side.</p>
+
+<div class="calcbox">
+  <div class="calc-row">
+    <label>Manure type
+      <select id="m-unit">
+        <option value="tons" selected>Solid (tons)</option>
+        <option value="gal">Liquid (gallons)</option>
+      </select>
+    </label>
+    <label>Spreader load size<input type="number" id="m-load" min="0.01" step="any" value="6"></label>
+  </div>
+  <div class="calc-row">
+    <label>Travel path length (ft)<input type="number" id="m-length" min="1" step="any" value="2000"></label>
+    <label>Spread width (ft)<input type="number" id="m-width" min="1" step="any" value="30"></label>
+  </div>
+  <div class="calc-row">
+    <label>Field size to cover (acres)<input type="number" id="m-field" min="0.01" step="any" value="40"></label>
+  </div>
+  <button type="button" id="m-run" class="btn" style="margin-top:4px;">Calculate</button>
+  <div id="m-out" class="calc-out" aria-live="polite"></div>
+</div>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return Math.round(n*100)/100;}
+  function run(){
+    var unit=$('m-unit').value;
+    var load=parseFloat($('m-load').value)||0;
+    var length=parseFloat($('m-length').value)||0;
+    var width=parseFloat($('m-width').value)||0;
+    var field=parseFloat($('m-field').value)||0;
+    var out=$('m-out');
+    if(load<=0||length<=0||width<=0||field<=0){
+      out.innerHTML='<p class="warn">Enter a value greater than zero in every field.</p>';
+      return;
+    }
+    var label = unit==='tons' ? 'tons' : 'gallons';
+    var acresPerLoad=(length*width)/43560;
+    var ratePerAcre=load/acresPerLoad;
+    var loadsNeeded=Math.ceil(field/acresPerLoad);
+    var totalNeeded=loadsNeeded*load;
+    out.innerHTML =
+      '<p class="ok"><strong>'+fmt(ratePerAcre)+' '+label+'/acre</strong> at this load size and travel path.</p>'+
+      '<table class="calc-table"><tbody>'+
+      '<tr><td>Area covered per load</td><td>'+fmt(acresPerLoad)+' acres</td></tr>'+
+      '<tr><td>Application rate</td><td>'+fmt(ratePerAcre)+' '+label+'/acre</td></tr>'+
+      '<tr><td>Loads needed for '+field+' acres</td><td>'+loadsNeeded+' loads</td></tr>'+
+      '<tr><td>Total manure for the field</td><td>'+fmt(totalNeeded)+' '+label+'</td></tr>'+
+      '</tbody></table>'+
+      '<p class="src">Load-area method: Penn State Extension, '+
+      'extension.psu.edu/manure-spreader-calibration. '+
+      'Your load size and path measurements are yours to supply.</p>';
+  }
+  $('m-run').addEventListener('click', run);
+  run();
+})();
+</script>
+
+<h2>Check it the other way: the tarp method</h2>
+<p>A second way to check your spreader, using a tarp instead of a measured travel path: weigh the manure that lands on a tarp of known size, then Rate (tons/acre) = (pounds on the tarp &times; 21.8) &divide; tarp area in square feet. 21.8 is 43,560 square feet per acre divided by 2,000 pounds per ton. Use a tarp sized 4′ 8″ &times; 4′ 8″ (21.8 square feet) and the pounds you weigh equal tons per acre directly, no further math needed.</p><p class="src">Source: North Dakota State University Extension, "Manure Spreader Calibration For Nutrient Management Planning," ndsu.edu/agriculture/extension/publications/manure-spreader-calibration-nutrient-management-planning, fetched 2026-09-28.</p>
+<h2>The honest gap: this can&#x27;t see your load or your path</h2>
+<p>The calculator cannot see how full the spreader really was or how straight you drove. Weigh a load if you can instead of trusting the rated capacity, and measure your actual spread width rather than guessing it -- a wrong load size or path width gives a confidently wrong rate no matter how correct the arithmetic is.</p>
+<h2>More farm-math tools</h2>
+<p>The <a href="https://fscholtesdowd.github.io/regen-farm-log/stocking-rate-calculator/">Stocking Rate Calculator</a> works out how many head your pasture carries; the <a href="https://fscholtesdowd.github.io/regen-farm-log/winter-hay-calculator/">Winter Hay Calculator</a> works out how many bales one winter takes; the <a href="https://fscholtesdowd.github.io/regen-farm-log/creep-feed-calculator/">Creep Feed Calculator</a> works out whether creep feeding pays.</p>
+<div class="cta">
+  <div class="cta-title">Keep this log on your phone</div>
+  <p>The Field Log is a free web app. It works with no signal, keeps photos with
+  the entry, and works out paddock rest days for you. One paddock free, forever.</p>
+  <a class="btn" href="https://fscholtesdowd.github.io/regen-farm-log/">Open the free Field Log</a>
+  <a class="btn alt" href="https://wealthywellness0.gumroad.com/l/regenfieldlog">Unlock every paddock + audit PDF, $29</a>
+</div>
+<footer>
+  Regen Farm Field Log &middot; <a href="https://fscholtesdowd.github.io/regen-farm-log/">the app</a>
+  <p class="fine"><a href="https://fscholtesdowd.github.io/privacy/">Privacy policy</a> &middot; <a href="https://fscholtesdowd.github.io/terms/">Terms</a></p>
+  <p>General information about recordkeeping, not legal or certification advice.
+  Your certifier is the authority on what your operation must keep.</p>
+</footer>
+</div>
+</body>
+</html>
