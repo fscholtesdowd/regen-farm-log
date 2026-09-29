@@ -117,7 +117,7 @@ def offline():
     for slug in ("grazing-records", "organic-certification-paperwork",
                  "organic-certification-recordkeeping", "stocking-rate-calculator",
                  "winter-hay-calculator", "creep-feed-calculator",
-                 "manure-application-calculator"):
+                 "manure-application-calculator", "pasture-rest-period"):
         p = HERE / slug / "index.html"
         check(f"page built: {slug}", p.exists() and p.stat().st_size > 2000)
 
@@ -195,8 +195,30 @@ def offline():
     check("page does not promise the wrong count", "four things" not in paper.lower()
           and "four sentences" not in paper.lower())
 
-    check("sitemap lists 8 urls",
-          (HERE / "sitemap.xml").read_text(encoding="utf-8").count("<loc>") == 8)
+    # --- pasture rest period: two independent cool-season sources + one warm-season ---
+    rest = (HERE / "pasture-rest-period" / "index.html").read_text(encoding="utf-8")
+    check("rest page cites its Shelton/TSCRA source",
+          "tscra.org/how-much-rest-does-your-pasture-need" in rest)
+    check("rest page cites its second (disagreeing) cool-season source",
+          "extension.umaine.edu/livestock/pasture-course" in rest)
+    check("rest page cites its warm-season source",
+          "extension.missouri.edu/publications/g4167" in rest)
+    check("rest page's cool-season table lists all 3 sourced season rows",
+          rest.count("<td>") >= 3 * 3 + 1 * 2)
+    check("rest page names the disagreement, doesn't average it away",
+          "don" in rest and "t agree" in rest)
+    check("rest page names the real trigger (height, not a date)",
+          "not a date" in rest or "not a rule" in rest)
+    check("rest page cross-links grazing-records and stocking-rate-calculator",
+          "grazing-records/" in rest and "stocking-rate-calculator/" in rest)
+    check("grazing-records links back to the rest page",
+          "pasture-rest-period/" in (HERE / "grazing-records" / "index.html")
+          .read_text(encoding="utf-8"))
+    check("stocking-rate calculator links to the rest page",
+          "pasture-rest-period/" in calc)
+
+    check("sitemap lists 9 urls",
+          (HERE / "sitemap.xml").read_text(encoding="utf-8").count("<loc>") == 9)
 
     # --- programmatic-seo gate (BLOCK if the gate file is missing) ---
     gate = TOOLS / "pseo_gate.py"
@@ -240,13 +262,13 @@ def live():
     for slug in ("grazing-records", "organic-certification-paperwork",
                  "organic-certification-recordkeeping", "stocking-rate-calculator",
                  "winter-hay-calculator", "creep-feed-calculator",
-                 "manure-application-calculator"):
+                 "manure-application-calculator", "pasture-rest-period"):
         s, b = fetch(f"{BASE}/{slug}/")
         check(f"live {slug} 200 + gumroad link",
               s == 200 and "gumroad.com/l/regenfieldlog" in b, f"got {s}")
 
     s, b = fetch(f"{BASE}/sitemap.xml")
-    check("sitemap served", s == 200 and b.count("<loc>") == 8, f"got {s}")
+    check("sitemap served", s == 200 and b.count("<loc>") == 9, f"got {s}")
 
 
 def main():

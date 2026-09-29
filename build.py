@@ -165,6 +165,53 @@ shown, not one source stretched to cover both. Load size, travel-path
 measurements and field size are the operator's own numbers to supply, same
 discipline as every calculator on this site.
 
+-- added 2026-09-29 (cloud research run #63), gated 2026-09-28 (run #62) as
+-- "pasture rest period by season", re-probed fresh rather than trusted stale
+-- (keyword_probe.py --selftest ran clean first, positive/negative both correct
+-- in this session):
+how long to rest a pasture            depth 4 (real variants: "after
+                                       grazing", "let pasture rest")          SHIP
+pasture rest period calculator        depth 0 (confirms the calculator
+                                       framing is dead, same finding as
+                                       run #62's rotational-grazing-
+                                       calculator kill -- the plain
+                                       question isn't)                        DROPPED (calc)
+pasture rest period by season         depth 0 (bare phrase, no exact-match
+                                       autocomplete -- same shape as every
+                                       other DROPPED bare phrase in this
+                                       file)                                  DROPPED (bare)
+zqxwvj plarn frotz mibblenock          0  (junk control, same run)
+Winnability checked before building (unchanged from the 09-28 gate): page 1
+for "how long to rest a pasture" is entirely extension/association content
+(Texas & Southwestern Cattle Raisers Association, Ohio State BEEF Cattle
+Letter -- same author, syndicated, counted once -- Penn State Extension) --
+no chart-shaped product on page 1, and this is content, not a calculator, so
+it does not compete with the paid app's own rotation-tracking feature the
+way a rest-period *calculator* would (that framing is confirmed dead above).
+
+The cool-season rest-by-season numbers are quoted from two INDEPENDENT
+sources that give genuinely different day counts for the same seasons -- not
+one source's range split into rows. Texas & Southwestern Cattle Raisers
+Association, "How much rest does your pasture need?" by Victor Shelton (NRCS
+state agronomist/grazing specialist, Indiana), fetched live 2026-09-29
+(https://tscra.org/how-much-rest-does-your-pasture-need/) -- the same piece
+is syndicated verbatim on Ohio State's Knox County Ag News and BEEF Cattle
+Letter under the same byline and the same May 2019 date, so it is counted as
+ONE source, not three. University of Maine Cooperative Extension's Pasture
+Course, Lesson 6, "Rotational Grazing," fetched live 2026-09-29
+(https://extension.umaine.edu/livestock/pasture-course/lesson-6/rotational-grazing/),
+gives shorter numbers for the same seasons -- disclosed as a real
+disagreement on the page, not averaged into an invented middle figure, same
+discipline as the winter-hay calculator's ring-feeder waste range and the
+creep-feed calculator's two conversion studies. The warm-season number is
+quoted from a third, separate source, University of Missouri Extension
+G4167, "Maximizing Summer Grazing: A Guide to Warm-Season Forage Management
+in Missouri," fetched live 2026-09-29
+(https://extension.missouri.edu/publications/g4167) -- attempted a fourth
+source (UNL G1908) for a second warm-season data point; it returned HTTP 503
+and a fifth (Hay & Forage Magazine) returned HTTP 403 -- both read like empty
+sources per this file's own ecfr.gov precedent above, so neither is quoted.
+
 Run: python build.py    (writes into this directory, then run verify.py)
 """
 from pathlib import Path
@@ -223,6 +270,10 @@ PAGES = [
              "signal. You pick the paddock, tap moved in or moved out, and add a photo "
              "if you want one. It works out rest days for every paddock on its own. "
              "Nothing is uploaded anywhere; the log lives on your phone."),
+        ],
+        "body_after_calc": [
+            ("How long should a paddock actually rest",
+             "GRAZING_TO_REST_LINK"),
         ],
     },
     {
@@ -340,6 +391,8 @@ PAGES = [
              "continuous grazing usually needs to run lower."),
             ("If you're feeding hay instead of grazing",
              "STOCKING_TO_HAY_LINK"),
+            ("How long to rest a paddock before grazing it again",
+             "STOCKING_TO_REST_LINK"),
         ],
     },
     {
@@ -478,6 +531,55 @@ PAGES = [
              "MANURE_CROSS_LINKS"),
         ],
     },
+    {
+        "slug": "pasture-rest-period",
+        "title": "Pasture Rest Period By Season: How Long to Rest Cool-Season "
+                 "and Warm-Season Grass",
+        "desc": "How many days a pasture needs to rest between grazings, by "
+                "season, for cool-season and warm-season grass -- two "
+                "university sources shown separately where they disagree, "
+                "not averaged.",
+        "h1": "Pasture Rest Period By Season",
+        "lede": "How long a pasture needs before it's grazed again changes "
+                "with how fast the grass in it is actually growing, not "
+                "with the calendar month. Two university sources give "
+                "different day counts for the same seasons; both are shown "
+                "here, not blended into one invented number.",
+        "body": [
+            ("Why one number doesn't cover the whole year",
+             "Grass in early spring can put on more growth in two weeks "
+             "than the same field manages in six weeks of summer heat. A "
+             "rest period set once at the start of the season is too short "
+             "by summer and too long by the next spring. The rest period "
+             "has to track the season, not a fixed schedule."),
+        ],
+        "body_after_calc": [
+            ("Cool-season grasses, by season",
+             "REST_TABLE_COOL"),
+            ("Warm-season grasses",
+             "REST_TABLE_WARM"),
+            ("Why the two cool-season sources don't agree",
+             "The two sources above measured the same kind of grass in the "
+             "same seasons and did not land on the same numbers -- by "
+             "summer, Shelton's range runs up to twice as long as the "
+             "University of Maine's. Neither is wrong; “rest period” "
+             "depends on soil, moisture, and how hard the paddock was "
+             "grazed before, none of which a season name alone tells you. "
+             "Both are shown so a real range is visible instead of one "
+             "invented middle number that neither source actually said."),
+            ("The real trigger is height, not a date on a calendar",
+             "Every rest-period range above is a starting guess, not a "
+             "rule -- the number that actually tells a paddock it's ready "
+             "is how tall the grass has grown back, not how many days have "
+             "passed. Shelton's own rule of thumb: when forage is growing "
+             "fast, move fast; when it slows down, move slower. A paddock "
+             "logged as “in” and “out” with a photo at each visit "
+             "shows you that regrowth directly instead of a day count "
+             "guessed from a table."),
+            ("More on rotation",
+             "PASTURE_REST_CROSS_LINKS"),
+        ],
+    },
 ]
 
 # Animal Unit Equivalents, University of Wyoming Extension B-1320, Table 1
@@ -517,6 +619,24 @@ WASTE_TABLE = [
     ("Cradle feeder", "14.6%", "MSU"),
     ("Open-bottom feeder / no containment", "up to 21%", "OSU"),
     ("Unrolled on the ground, no rack", "up to 40%", "Univ. of Missouri Extension G4570"),
+]
+
+# Cool-season pasture rest by season, from two INDEPENDENT sources with
+# genuinely different numbers for the same seasons -- shown as reported, not
+# averaged. Shelton/TSCRA fetched live 2026-09-29
+# (tscra.org/how-much-rest-does-your-pasture-need), U Maine Extension fetched
+# live 2026-09-29 (extension.umaine.edu/livestock/pasture-course/lesson-6/
+# rotational-grazing).
+REST_TABLE_COOL = [
+    ("Early growing season (spring)", "14+ days", "10–15 days"),
+    ("Growth slowing (late spring / early summer)", "30+ days", "15–20 days"),
+    ("Summer heat & dry conditions, into fall", "45–60 days", "25–30 days"),
+]
+
+# Warm-season grass rest, University of Missouri Extension G4167, fetched
+# live 2026-09-29 (extension.missouri.edu/publications/g4167).
+REST_TABLE_WARM = [
+    ("Bermudagrass, big bluestem & other warm-season grasses", "6–8 weeks (42–56 days)"),
 ]
 
 CALC_HTML = """
@@ -888,7 +1008,10 @@ def render(page):
         parts.append(CREEP_CALC_HTML if calc == "creep" else
                      HAY_CALC_HTML if calc == "hay" else
                      MANURE_CALC_HTML if calc == "manure" else CALC_HTML)
-        for h2, text in page.get("body_after_calc", []):
+    # body_after_calc is not exclusive to calculator pages -- a content page
+    # (no "calc" key) can use it too, for tables/cross-links that need a
+    # marker instead of plain escaped text.
+    for h2, text in page.get("body_after_calc", []):
             parts.append(f"<h2>{html.escape(h2)}</h2>")
             if text == "AUE_TABLE":
                 rows = "\n".join(
@@ -982,6 +1105,52 @@ def render(page):
                              f'winter takes; the <a href="{BASE}/creep-feed-calculator/">'
                              'Creep Feed Calculator</a> works out whether creep feeding '
                              'pays.</p>')
+            elif text == "REST_TABLE_COOL":
+                rows = "\n".join(
+                    f"  <tr><td>{html.escape(season)}</td><td>{shelton}</td><td>{maine}</td></tr>"
+                    for season, shelton, maine in REST_TABLE_COOL)
+                parts.append('<table class="aue"><thead><tr><th>Season</th>'
+                             '<th>Shelton / TSCRA (NRCS)</th>'
+                             f'<th>U Maine Extension</th></tr></thead><tbody>\n{rows}\n</tbody></table>'
+                             '<p class="src">Sources: Texas & Southwestern Cattle Raisers '
+                             'Association, <a href="https://tscra.org/how-much-rest-does-your-pasture-need/">'
+                             '"How much rest does your pasture need?"</a> by Victor Shelton, '
+                             'NRCS state agronomist/grazing specialist, fetched 2026-09-29 '
+                             '(the same piece is syndicated on Ohio State’s Knox County '
+                             'Ag News and BEEF Cattle Letter under the same byline, counted '
+                             'once); and University of Maine Cooperative Extension, '
+                             '<a href="https://extension.umaine.edu/livestock/pasture-course/lesson-6/rotational-grazing/">'
+                             '"Rotational Grazing," Pasture Course Lesson 6</a>, fetched '
+                             '2026-09-29.</p>')
+            elif text == "REST_TABLE_WARM":
+                rows = "\n".join(
+                    f"  <tr><td>{html.escape(name)}</td><td>{days}</td></tr>"
+                    for name, days in REST_TABLE_WARM)
+                parts.append('<table class="aue"><thead><tr><th>Grass</th>'
+                             f'<th>Rest period</th></tr></thead><tbody>\n{rows}\n</tbody></table>'
+                             '<p class="src">Source: University of Missouri Extension G4167, '
+                             '<a href="https://extension.missouri.edu/publications/g4167">'
+                             '"Maximizing Summer Grazing: A Guide to Warm-Season Forage '
+                             'Management in Missouri"</a>, fetched 2026-09-29.</p>')
+            elif text == "PASTURE_REST_CROSS_LINKS":
+                parts.append('<p>Logging when a paddock is grazed and when it’s '
+                             f'rested? <a href="{BASE}/grazing-records/">Grazing '
+                             'Records</a> covers what to write down at the gate. '
+                             f'Working out how many head that paddock can carry? '
+                             f'The <a href="{BASE}/stocking-rate-calculator/">Stocking '
+                             'Rate Calculator</a> does that math.</p>')
+            elif text == "GRAZING_TO_REST_LINK":
+                parts.append('<p>Rest periods change by season and by how fast the '
+                             'grass is actually growing back -- '
+                             f'<a href="{BASE}/pasture-rest-period/">Pasture Rest '
+                             'Period By Season</a> covers what two university '
+                             'sources say for cool-season and warm-season grass.</p>')
+            elif text == "STOCKING_TO_REST_LINK":
+                parts.append('<p>The utilization rate above assumes a paddock gets '
+                             'a real rest before it’s grazed again -- '
+                             f'<a href="{BASE}/pasture-rest-period/">Pasture Rest '
+                             'Period By Season</a> covers how many days that '
+                             'actually takes.</p>')
             else:
                 parts.append(f"<p>{html.escape(text)}</p>")
     return SHELL.format(base=BASE, body="\n".join(parts), **{
