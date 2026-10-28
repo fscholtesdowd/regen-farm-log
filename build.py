@@ -982,6 +982,7 @@ SHELL = """<!DOCTYPE html>
 </div>
 <footer>
   Regen Farm Field Log &middot; <a href="{base}/">the app</a>
+  <p class="fine">More free tools: <a href="https://fscholtesdowd.github.io/">all our free tools</a> &middot; <a href="https://fscholtesdowd.github.io/planting-dates/">Planting dates by zone</a> &middot; <a href="https://fscholtesdowd.github.io/firewood-calculator/">Firewood calculator</a> &middot; <a href="https://fscholtesdowd.github.io/good-bug-bad-bug/">Garden bug ID</a> &middot; <a href="https://fscholtesdowd.github.io/contour-level/">Phone contour level</a></p>
   <p class="fine"><a href="https://fscholtesdowd.github.io/privacy/">Privacy policy</a> &middot; <a href="https://fscholtesdowd.github.io/terms/">Terms</a></p>
   <p>General information about recordkeeping, not legal or certification advice.
   Your certifier is the authority on what your operation must keep.</p>
