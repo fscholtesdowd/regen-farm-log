@@ -969,7 +969,7 @@ SHELL = """<!DOCTYPE html>
     .btn {{ color:#14161a; }}
   }}
 </style>
-</head>
+{og}</head>
 <body>
 <div class="wrap">
 <nav class="crumbs"><a href="{base}/">&larr; Regen Farm Field Log</a></nav>
@@ -1166,7 +1166,23 @@ def render(page):
             {"@type": "ListItem", "position": 2, "name": page["h1"], "item": f"{BASE}/{page['slug']}/"},
         ],
     }
-    return SHELL.format(base=BASE, body="\n".join(parts),
+    og_url = f"{BASE}/{page['slug']}/"
+    og_img = f"{BASE}/og-image.png"
+    og_t = html.escape(page["title"], quote=True)
+    og_d = html.escape(page["desc"], quote=True)
+    og = (
+        '<!-- OG-TWITTER-TAGS-2026-10-01 -->\n'
+        '<meta property="og:type" content="website">\n'
+        f'<meta property="og:title" content="{og_t}">\n'
+        f'<meta property="og:description" content="{og_d}">\n'
+        f'<meta property="og:url" content="{og_url}">\n'
+        f'<meta property="og:image" content="{og_img}">\n'
+        '<meta name="twitter:card" content="summary_large_image">\n'
+        f'<meta name="twitter:title" content="{og_t}">\n'
+        f'<meta name="twitter:description" content="{og_d}">\n'
+        f'<meta name="twitter:image" content="{og_img}">\n'
+    )
+    return SHELL.format(base=BASE, body="\n".join(parts), og=og,
         schema=json.dumps(breadcrumb, ensure_ascii=False), **{
         k: html.escape(v, quote=True) if k in ("title", "desc") else v
         for k, v in page.items() if k in ("slug", "title", "desc", "h1", "lede")
