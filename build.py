@@ -311,7 +311,7 @@ PAGES = [
              "Records have to be kept for not less than 5 years beyond their creation. "
              "A phone gets replaced about every three. Whatever you keep records in, "
              "the question to ask is how you get five years of them out of it and onto "
-             "something you still control."),
+             "something you still control. [[LINK_TO_RECORDKEEPING]]"),
         ],
         "cfr": True,
     },
@@ -342,7 +342,7 @@ PAGES = [
              "amount. Supplier, product name, whether it is listed. This is the field "
              "most people leave blank and the one most likely to be asked about, "
              "because it is what connects what you applied to whether you were allowed "
-             "to apply it."),
+             "to apply it. [[LINK_TO_PAPERWORK]]"),
             ("Export should be one button, once a year",
              "You keep records all year and need them in a readable pile exactly once. "
              "So the export is the part worth getting right: everything grouped by "
@@ -997,10 +997,27 @@ SHELL = """<!DOCTYPE html>
 """
 
 
+def _para(text):
+    """Escape a body paragraph, then expand the two cross-link tokens."""
+    para = html.escape(text)
+    para = para.replace(
+        "[[LINK_TO_RECORDKEEPING]]",
+        f'<a href="{BASE}/organic-certification-recordkeeping/">Organic '
+        'Certification Record Keeping Without a Filing Cabinet</a> covers '
+        'the day-to-day system that makes that export possible.')
+    para = para.replace(
+        "[[LINK_TO_PAPERWORK]]",
+        'That is the audit trail 7 CFR 205.103 asks for — '
+        f'<a href="{BASE}/organic-certification-paperwork/">Organic '
+        'Certification Paperwork: What the Rule Actually Asks For</a> '
+        'quotes the rule\'s five requirements in full.')
+    return para
+
+
 def render(page):
     parts = []
     for i, (h2, text) in enumerate(page["body"]):
-        parts.append(f"<h2>{html.escape(h2)}</h2>\n<p>{html.escape(text)}</p>")
+        parts.append(f"<h2>{html.escape(h2)}</h2>\n<p>{_para(text)}</p>")
         # The quoted rule text sits under its own heading on the paperwork page.
         if page.get("cfr") and i == 0:
             items = "\n".join(f"  <li>{html.escape(b)}</li>" for b in CFR_BULLETS)

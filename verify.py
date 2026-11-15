@@ -194,6 +194,11 @@ def offline():
         check(f"205.103(b) fragment present: {frag[:38]}", frag in paper)
     check("page does not promise the wrong count", "four things" not in paper.lower()
           and "four sentences" not in paper.lower())
+    keeping = (HERE / "organic-certification-recordkeeping" / "index.html").read_text(encoding="utf-8")
+    check("paperwork page links to the recordkeeping page",
+          "organic-certification-recordkeeping/" in paper)
+    check("recordkeeping page links back to the paperwork page",
+          "organic-certification-paperwork/" in keeping)
 
     # --- pasture rest period: two independent cool-season sources + one warm-season ---
     rest = (HERE / "pasture-rest-period" / "index.html").read_text(encoding="utf-8")
