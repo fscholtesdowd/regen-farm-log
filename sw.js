@@ -1,7 +1,7 @@
 // BUMP THIS on every shipped change to index.html / css / js. The fetch handler
 // below is cache-first, so a returning visitor keeps being served the OLD app
 // until the cache name changes. v2 = 2026-09-18, the free/pro licence gate.
-const CACHE_NAME = 'field-log-v4';
+const CACHE_NAME = 'field-log-v5';
 const ASSETS = [
   './',
   './index.html',

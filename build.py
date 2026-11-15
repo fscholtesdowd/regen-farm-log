@@ -216,6 +216,7 @@ Run: python build.py    (writes into this directory, then run verify.py)
 """
 from pathlib import Path
 import html
+import json
 
 HERE = Path(__file__).resolve().parent
 BASE = "https://fscholtesdowd.github.io/regen-farm-log"
@@ -918,6 +919,8 @@ SHELL = """<!DOCTYPE html>
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <link rel="canonical" href="{base}/{slug}/">
+<!-- breadcrumb-schema-v1 -->
+<script type="application/ld+json">{schema}</script>
 <style>
   :root {{ --bg:#faf9f6; --surface:#fff; --text:#22251f; --dim:#5d6157;
            --accent:#3a5a2a; --border:#e0ddd4; }}
@@ -1155,7 +1158,16 @@ def render(page):
                              'actually takes.</p>')
             else:
                 parts.append(f"<p>{html.escape(text)}</p>")
-    return SHELL.format(base=BASE, body="\n".join(parts), **{
+    breadcrumb = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Regen Farm Field Log", "item": f"{BASE}/"},
+            {"@type": "ListItem", "position": 2, "name": page["h1"], "item": f"{BASE}/{page['slug']}/"},
+        ],
+    }
+    return SHELL.format(base=BASE, body="\n".join(parts),
+        schema=json.dumps(breadcrumb, ensure_ascii=False), **{
         k: html.escape(v, quote=True) if k in ("title", "desc") else v
         for k, v in page.items() if k in ("slug", "title", "desc", "h1", "lede")
     })
